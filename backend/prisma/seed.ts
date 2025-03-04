@@ -1,80 +1,50 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
+const userCount = process.argv[2] ? parseInt(process.argv[2]) : 5;
+
 async function main() {
-  try {
-    console.log('Seeding the database...');
+  console.log(`Seeding the database with ${userCount} users...`);
 
-    const hashedPassword = await bcrypt.hash('admin123', 10);
+  const hashedPassword = await bcrypt.hash('password123', 10);
 
-    const admin = await prisma.user.upsert({
-      where: { email: 'admin@example.com' },
-      update: {},
-      create: {
-        name: 'Admin User',
-        email: 'admin@example.com',
-        password: hashedPassword,
-        role: 'ADMIN',
-      },
-    });
+  const admin = await prisma.user.upsert({
+    where: { email: 'admin@example.com' },
+    update: {},
+    create: {
+      name: 'Admin User',
+      email: 'admin@example.com',
+      password: await bcrypt.hash('admin123', 10),
+      role: Role.ADMIN,
+    },
+  });
 
-    console.log('Admin user created:', admin.email);
+  console.log(`Admin created: ${admin.email}`);
 
-    const user1 = await prisma.user.create({
-      data: {
-        name: 'John Doe',
-        email: 'john@example.com',
-        password: await bcrypt.hash('password123', 10),
-        role: 'MEMBER',
-      },
-    });
+  const users = Array.from({ length: userCount }).map((_, i) => ({
+    name: `User ${i + 1}`,
+    email: `user${i + 1}@example.com`,
+    password: hashedPassword,
+    role: Role.MEMBER,
+  }));
 
-    const user2 = await prisma.user.create({
-      data: {
-        name: 'Jane Doe',
-        email: 'jane@example.com',
-        password: await bcrypt.hash('password123', 10),
-        role: 'MEMBER',
-      },
-    });
+  await prisma.user.createMany({
+    data: users,
+    skipDuplicates: true, 
+  });
 
-    console.log('✅ Sample users created:', user1.email, user2.email);
-
-    await prisma.task.createMany({
-      data: [
-        {
-          title: 'Setup Project',
-          description: 'Initialize project repository and setup dependencies',
-          dueDate: new Date(),
-          status: 'TODO',
-          taskOrder: 1,
-          createdBy: admin.id,
-          assignedTo: user1.id,
-        },
-        {
-          title: 'Database Migration',
-          description: 'Run Prisma migrations for MySQL',
-          dueDate: new Date(),
-          status: 'IN_PROGRESS',
-          taskOrder: 2,
-          createdBy: admin.id,
-          assignedTo: user2.id,
-        },
-      ],
-    });
-
-    console.log('Sample tasks created.');
-  } catch (error) {
-    console.error('Error while seeding:', error);
-  } finally {
-    await prisma.$disconnect();
-  }
+  console.log(`${userCount} Users Created!`);
 }
 
-
-main().catch((e) => {
-  console.error('Unexpected Error:', e);
-  process.exit(1);
-});
+main()
+  .catch((e) => {
+    console.error('Seeding error:', e);
+    process.exit(1);
+  })
+  .finally(() => {
+    prisma
+      .$disconnect()
+      .catch((err) => console.error('Error disconnecting Prisma:', err));
+  });

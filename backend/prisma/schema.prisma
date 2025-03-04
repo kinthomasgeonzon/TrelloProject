@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  id        Int       @id @default(autoincrement())
   name      String
   email     String    @unique
   password  String
@@ -22,21 +22,20 @@ model User {
 }
 
 model Task {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  id          Int       @id @default(autoincrement())
   title       String
   description String?
   dueDate     DateTime?
   status      Status
-  order       Int
-  createdBy   String    @db.ObjectId
-  assignedTo  String?   @db.ObjectId
+  taskOrder   Int
+  createdBy   Int
+  assignedTo  Int?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
 
-  creator  User   @relation("CreatedTasks", references: [id], fields: [createdBy])
-  assignee User?  @relation("AssignedTasks", references: [id], fields: [assignedTo])
-  userId   String
+  creator  User  @relation("CreatedTasks", fields: [createdBy], references: [id])
+  assignee User? @relation("AssignedTasks", fields: [assignedTo], references: [id])
 }
 
 enum Role {

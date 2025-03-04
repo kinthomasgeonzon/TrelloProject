@@ -23,6 +23,7 @@
     "seed": "ts-node --transpile-only prisma/seed.ts"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.5.1",
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.11",
@@ -44,6 +45,7 @@
     "@swc/cli": "^0.6.0",
     "@swc/core": "^1.10.7",
     "@types/express": "^5.0.0",
+    "@types/faker": "^6.6.8",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.13.9",
     "@types/supertest": "^6.0.2",

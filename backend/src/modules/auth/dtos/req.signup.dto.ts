@@ -6,6 +6,9 @@ export class ReqSignupDto {
 
   @IsNotEmpty({ message: 'Password is required' })
   @MinLength(6, { message: 'Password must be at least 6 characters' })
+  @Matches(/^(?!\s+$).+/, {
+    message: 'Password cannot be empty or contain only spaces',
+  })
   password!: string;
 
   @IsNotEmpty({ message: 'Name is required' })

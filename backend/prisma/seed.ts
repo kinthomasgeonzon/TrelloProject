@@ -1,5 +1,6 @@
 import { PrismaClient, Role, Status } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
+
 
 const prisma = new PrismaClient();
 
@@ -9,7 +10,13 @@ const taskCount = process.argv[3] ? parseInt(process.argv[3]) : 10;
 async function seedUsers() {
   console.log(`Seeding the database with ${userCount} users...`);
 
-  const hashedPassword = await bcrypt.hash('password123', 10);
+  let hashedPassword: string;
+  try {
+    hashedPassword = await bcrypt.hash('admin123', 10);
+  } catch (error) {
+    console.error('Error hashing password:', error);
+    throw error;
+  }
 
   const admin = await prisma.user.upsert({
     where: { email: 'admin@example.com' },
@@ -48,8 +55,10 @@ async function seedTasks() {
   });
 
   if (users.length === 0) {
-    console.log('No users found! Make sure to run the user seeder first.');
+    console.error('No users found! Make sure to run the user seeder first.');
     return;
+  } else {
+    console.log(`Found ${users.length} users.`);
   }
 
   const admin = await prisma.user.findFirst({
@@ -58,19 +67,36 @@ async function seedTasks() {
   });
 
   if (!admin) {
-    console.log('Admin user not found! Ensure user seeder ran successfully.');
+    console.error('Admin user not found! Ensure user seeder ran successfully.');
     return;
+  } else {
+    console.log(`Admin ID: ${admin.id}`);
   }
 
-  const tasks = Array.from({ length: taskCount }).map((_, i) => ({
-    title: `Task ${i + 1}`,
-    description: `Description for Task ${i + 1}`,
-    dueDate: new Date(Date.now() + Math.floor(Math.random() * 10) * 86400000),
-    status: Object.values(Status)[Math.floor(Math.random() * 3)], 
-    taskOrder: i + 1,
-    createdBy: admin.id,
-    assignedTo: users[Math.floor(Math.random() * users.length)].id, 
-  }));
+  const tasks: {
+    title: string;
+    description: string;
+    dueDate: Date;
+    status: Status;
+    taskOrder: number;
+    createdBy: number;
+    assignedTo: number;
+  }[] = [];
+
+  for (let i = 0; i < taskCount; i++) {
+    const assignedUser = users[Math.floor(Math.random() * users.length)].id;
+    const task = {
+      title: `Task ${i + 1}`,
+      description: `Description for Task ${i + 1}`,
+      dueDate: new Date(Date.now() + Math.floor(Math.random() * 10) * 86400000),
+      status: Object.values(Status)[Math.floor(Math.random() * 3)],
+      taskOrder: i + 1,
+      createdBy: admin.id,
+      assignedTo: assignedUser,
+    };
+    tasks.push(task);
+    console.log(`Prepared Task ${i + 1}: Assigned to User ID ${assignedUser}`);
+  }
 
   await prisma.task.createMany({
     data: tasks,

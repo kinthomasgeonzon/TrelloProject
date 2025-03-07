@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": "./",
     "target": "ES2017",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -12,6 +13,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
+    "forceConsistentCasingInFileNames": true,
     "incremental": true,
     "plugins": [
       {
@@ -19,7 +21,13 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@components/*": ["app/components/*"],
+      "@features/*": ["app/features/*"],
+      "@hooks/*": ["app/features/signup/hooks/*"],
+      "@styles/*": ["app/features/signup/styles/*"],
+      "@schemas/*": ["app/features/signup/schemas/*"],
+      "@store/*": ["app/store/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

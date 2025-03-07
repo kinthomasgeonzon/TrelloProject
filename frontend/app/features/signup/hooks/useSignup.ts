@@ -2,12 +2,14 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import { SignupFormData, signupSchema } from "@schemas/signupSchema";
+import { useSignupUserMutation } from "@store/api/signupSlice";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useSignupUserMutation } from "../../../store/api/signupSlice";
-import { SignupFormData, signupSchema } from "../schemas/signupSchema";
 
 export const useSignup = () => {
-  const [signupUser, { isLoading: loading, isSuccess: success, error }] = useSignupUserMutation();
+  const [signupUser, { isLoading: loading, isSuccess: success }] = useSignupUserMutation();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const {
     register,
@@ -17,12 +19,11 @@ export const useSignup = () => {
     resolver: zodResolver(signupSchema),
   });
 
-
   const getErrorMessage = (error: unknown) => {
     if (error && typeof error === "object" && "data" in error) {
       const errData = (error as FetchBaseQueryError).data;
-      if (typeof errData === "object" && errData !== null && "message" in errData) {
-        return (errData as { message: string }).message;
+      if (errData && typeof errData === "object" && "message" in errData) {
+        return (errData as { message?: string }).message || "Signup failed. Try again.";
       }
     }
     return "Signup failed. Try again.";
@@ -30,9 +31,11 @@ export const useSignup = () => {
 
   const onSubmit = async (data: SignupFormData) => {
     try {
+      setErrorMessage(null); 
       await signupUser(data).unwrap();
     } catch (err) {
       console.error("Signup failed:", err);
+      setErrorMessage(getErrorMessage(err)); 
     }
   };
 
@@ -43,6 +46,6 @@ export const useSignup = () => {
     onSubmit,
     loading,
     success,
-    error: error ? getErrorMessage(error) : null,
+    error: errorMessage, 
   };
 };

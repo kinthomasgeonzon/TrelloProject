@@ -24,9 +24,7 @@
       "@/*": ["./*"],
       "@components/*": ["app/components/*"],
       "@features/*": ["app/features/*"],
-      "@hooks/*": ["app/features/signup/hooks/*"],
-      "@styles/*": ["app/features/signup/styles/*"],
-      "@schemas/*": ["app/features/signup/schemas/*"],
+      "@signup/*": ["app/features/signup/*"],
       "@store/*": ["app/store/*"]
     }
   },

@@ -1,5 +1,5 @@
+import { signupApi } from "@/app/store/api/authSlice";
 import { configureStore } from "@reduxjs/toolkit";
-import { signupApi } from "@store/api/signupSlice";
 
 export const store = configureStore({
   reducer: {

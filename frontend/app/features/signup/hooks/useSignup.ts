@@ -1,9 +1,9 @@
 "use client";
 
+import { useSignupUserMutation } from "@/app/store/api/authSlice";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { SignupFormData, signupSchema } from "@signup/schemas/signupSchema";
-import { useSignupUserMutation } from "@store/api/signupSlice";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 

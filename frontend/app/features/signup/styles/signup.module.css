@@ -1,0 +1,33 @@
+.signupContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+  }
+  
+  .signupBox {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    background-color: #222; /* Adjust for visibility */
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .label {
+    display: block;
+    text-align: left;
+    margin-bottom: 5px;
+  }
+  
+  .input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+  }
+  
+  .button {
+    width: 100%;
+  }
+  

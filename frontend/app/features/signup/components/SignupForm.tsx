@@ -3,7 +3,7 @@
 import Button from "@components/button/Button";
 import Input from "@components/input/Input";
 import { useSignup } from "@signup/hooks/useSignup";
-import styles from "@styles/signup.module.css";
+import styles from "@signup/styles/signup.module.css";
 import React from "react";
 
 const SignupForm: React.FC = () => {

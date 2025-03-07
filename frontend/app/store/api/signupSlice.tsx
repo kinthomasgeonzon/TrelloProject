@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { SignupFormData } from "../../features/signup/schemas/signupSchema";
+import { SignupFormData } from "@signup/schemas/signupSchema";
 
 export const signupApi = createApi({
   reducerPath: "signupApi",

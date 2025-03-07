@@ -2,7 +2,7 @@
 
 import Button from "@components/button/Button";
 import Input from "@components/input/Input";
-import { useSignup } from "@hooks/useSignup";
+import { useSignup } from "@signup/hooks/useSignup";
 import styles from "@styles/signup.module.css";
 import React from "react";
 

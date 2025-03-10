@@ -9,10 +9,7 @@ export class TaskService {
 
   async createTask(dto: CreateTaskDto): Promise<ResCreateTaskDto> {
     const task = await this.prisma.task.create({
-      data: {
-        ...dto,
-        dueDate: dto.dueDate ? new Date(dto.dueDate) : null,
-      },
+      data: dto,
     });
 
     return {

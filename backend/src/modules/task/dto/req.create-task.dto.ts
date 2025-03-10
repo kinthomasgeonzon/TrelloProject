@@ -1,5 +1,5 @@
 import { Status } from '@prisma/client';
-import { Transform } from 'class-transformer';
+import { Type } from 'class-transformer';
 import {
   IsDate,
   IsEnum,
@@ -34,9 +34,7 @@ export class CreateTaskDto {
   taskOrder!: number;
 
   @IsOptional()
-  @Transform(({ value }: { value: string | number | Date }) =>
-    value ? new Date(value) : null,
-  )
+  @Type(() => Date)
   @IsDate()
   dueDate?: Date;
 }

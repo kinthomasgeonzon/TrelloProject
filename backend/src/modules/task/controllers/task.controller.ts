@@ -7,7 +7,7 @@ export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
   @Post()
-  create(@Body() dto: CreateTaskDto) {
-    return this.taskService.createTask(dto);
+  async create(@Body() dto: CreateTaskDto) {
+    return await this.taskService.createTask(dto);
   }
 }

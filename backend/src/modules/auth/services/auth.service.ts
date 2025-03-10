@@ -1,9 +1,10 @@
 import {
-    ConflictException,
-    Injectable,
-    UnauthorizedException,
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Role } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../../../prisma.service';
 import { ReqLoginDto } from '../dtos/req.login.dto';
@@ -32,7 +33,7 @@ export class AuthService {
         email,
         password: hashedPassword,
         name: name.trim(),
-        role: 'MEMBER',
+        role: Role.MEMBER,
       },
     });
 

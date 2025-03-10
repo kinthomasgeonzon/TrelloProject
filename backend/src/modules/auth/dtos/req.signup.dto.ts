@@ -1,18 +1,9 @@
-import { IsEmail, IsNotEmpty, Matches, MinLength } from 'class-validator';
+import { IsNotEmpty, Matches } from 'class-validator';
+import { BaseAuthDto } from './base.auth.dto';
 
-export class ReqSignupDto {
-  @IsEmail({}, { message: 'Invalid email format' })
-  email!: string;
-
-  @IsNotEmpty({ message: 'Password is required' })
-  @MinLength(6, { message: 'Password must be at least 6 characters' })
-  @Matches(/^(?!\s+$).+/, {
-    message: 'Password cannot be empty or contain only spaces',
-  })
-  password!: string;
-
+export class ReqSignupDto extends BaseAuthDto {
   @IsNotEmpty({ message: 'Name is required' })
-  @Matches(/^(?!\s*$).+/, {
+  @Matches(/(?!^\s*$).+/, {
     message: 'Name cannot be empty or contain only spaces',
   })
   name!: string;

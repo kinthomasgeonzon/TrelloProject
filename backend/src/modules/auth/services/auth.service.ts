@@ -37,10 +37,10 @@ export class AuthService {
       },
     });
 
-    const token = await this.jwtService.signAsync(
-      { sub: user.id, email: user.email },
-      { expiresIn: '7d' },
-    );
+    const payload = { sub: user.id, email: user.email, role: user.role };
+    console.log('Signing JWT with payload:', payload); 
+
+    const token = await this.jwtService.signAsync(payload, { expiresIn: '7d' });
 
     return {
       message: 'Signup successful',
@@ -67,10 +67,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const token = await this.jwtService.signAsync(
-      { sub: user.id, email: user.email },
-      { expiresIn: '7d' },
-    );
+    const payload = { id: user.id, email: user.email, role: user.role };
+    console.log('Signing JWT with payload:', payload); 
+
+    const token = await this.jwtService.signAsync(payload, { expiresIn: '7d' });
 
     return {
       message: 'Login successful',

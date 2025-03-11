@@ -20,6 +20,6 @@ export class AuthController {
 
   @Post('reset-password')
   async resetPassword(@Body('email') email: string) {
-    return this.authService.resetPassword(email);
+    return await this.authService.resetPassword(email);
   }
 }

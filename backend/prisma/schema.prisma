@@ -17,7 +17,7 @@ model User {
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
 
-  resetToken String? 
+  passwordResetToken String? 
 
   tasksCreated  Task[] @relation("CreatedTasks")
   tasksAssigned Task[] @relation("AssignedTasks")

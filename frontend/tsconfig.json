@@ -25,7 +25,8 @@
       "@components/*": ["app/components/*"],
       "@features/*": ["app/features/*"],
       "@signup/*": ["app/features/signup/*"],
-      "@store/*": ["app/store/*"]
+      "@store/*": ["app/store/*"],
+      "@login/*": ["app/features/login/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

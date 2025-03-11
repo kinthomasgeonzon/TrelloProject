@@ -38,7 +38,6 @@ export class AuthService {
     });
 
     const payload = { sub: user.id, email: user.email, role: user.role };
-    console.log('Signing JWT with payload:', payload); 
 
     const token = await this.jwtService.signAsync(payload, { expiresIn: '7d' });
 
@@ -68,7 +67,6 @@ export class AuthService {
     }
 
     const payload = { id: user.id, email: user.email, role: user.role };
-    console.log('Signing JWT with payload:', payload); 
 
     const token = await this.jwtService.signAsync(payload, { expiresIn: '7d' });
 

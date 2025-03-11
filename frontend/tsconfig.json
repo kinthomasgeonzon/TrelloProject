@@ -27,6 +27,7 @@
       "@signup/*": ["app/features/signup/*"],
       "@store/*": ["app/store/*"],
       "@login/*": ["app/features/login/*"],
+      "@kanban/*": ["app/features/kanban/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

@@ -2,18 +2,18 @@
 
 import Button from "@components/button/Button";
 import Input from "@components/input/Input";
-import { useRouter, useSearchParams } from "next/navigation"; // Import useRouter
+import { useRouter, useSearchParams } from "next/navigation"; 
 import { useState } from "react";
 import styles from "../styles/resetPassword.module.css";
 
 const ResetPasswordPage = () => {
   const searchParams = useSearchParams();
   const token = searchParams ? searchParams.get("token") : null;
-  const router = useRouter(); // Initialize useRouter
+  const router = useRouter(); 
   const [newPassword, setNewPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false); // Track success state
+  const [isSuccess, setIsSuccess] = useState(false); 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +35,7 @@ const ResetPasswordPage = () => {
       setMessage("Password updated! Redirecting to login...");
       setIsSuccess(true);
       
-      // Redirect to login after 5 seconds
+  
       setTimeout(() => {
         router.push("/login");
       }, 5000);

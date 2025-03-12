@@ -102,6 +102,7 @@ export default function CreateTaskForm() {
         <Input
           label="Assigned To (Optional)"
           type="number"
+          min="0"
           value={assignedTo}
           onChange={(e) =>
             setAssignedTo(e.target.value ? Number(e.target.value) : "")

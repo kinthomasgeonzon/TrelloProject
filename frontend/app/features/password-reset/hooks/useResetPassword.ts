@@ -47,7 +47,7 @@ const useResetPassword = (): {
         throw new Error(resData.message || "Something went wrong");
       }
 
-      setMessage("If this email is registered, a reset link has been sent.");
+      setMessage("A reset link has been sent.");
     } catch (error: any) {
       setMessage(error.message);
     } finally {

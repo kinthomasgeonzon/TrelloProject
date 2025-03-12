@@ -1,8 +1,8 @@
 "use client";
 
+import useResetPassword from "@/app/features/password-reset/hooks/useResetPassword";
 import Button from "@components/button/Button";
 import Input from "@components/input/Input";
-import useResetPassword from "@password-reset/hooks/useResetPassword";
 import styles from "../styles/resetPassword.module.css";
 
 const ResetPasswordForm = () => {

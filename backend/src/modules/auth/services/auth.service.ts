@@ -11,6 +11,7 @@ import * as bcrypt from 'bcryptjs';
 import { Resend } from 'resend';
 import { PrismaService } from '../../../prisma.service';
 import { ReqLoginDto } from '../dtos/req.login.dto';
+import { ReqResetPasswordDto } from '../dtos/req.reset-password.dto';
 import { ReqSignupDto } from '../dtos/req.signup.dto';
 import { ResSignupDto } from '../dtos/res.signup.dto';
 
@@ -103,7 +104,7 @@ export class AuthService {
       data: { passwordResetToken },
     });
 
-    const resetLink = `http://localhost:3000/auth/reset-password?token=${passwordResetToken}`;
+    const resetLink = `http://localhost:3000/update-password?token=${passwordResetToken}`;
 
     try {
       await this.resend.emails.send({
@@ -122,6 +123,26 @@ export class AuthService {
       throw new InternalServerErrorException(
         'Failed to send email. Please try again later.',
       );
+    }
+  }
+  async updatePassword({ token, newPassword }: ReqResetPasswordDto) {
+    try {
+      const decoded = await this.jwtService.verifyAsync(token);
+      const user = await this.prisma.user.findUnique({
+        where: { id: decoded.userId },
+      });
+
+      if (!user) throw new NotFoundException('User not found');
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { password: hashedPassword, passwordResetToken: null },
+      });
+
+      return { message: 'Password updated successfully' };
+    } catch {
+      throw new UnauthorizedException('Invalid or expired token');
     }
   }
 }

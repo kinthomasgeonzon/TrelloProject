@@ -1,3 +1,5 @@
+"use client";
+
 import Button from "@/app/components/button/Button";
 import Input from "@/app/components/input/Input";
 import { useLoginUserMutation } from "@/app/store/api/authSlice";
@@ -13,6 +15,7 @@ const LoginForm: React.FC = () => {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
@@ -27,6 +30,8 @@ const LoginForm: React.FC = () => {
       console.error("Login failed", err);
     }
   };
+
+  const emailValue = watch("email");
 
   return (
     <div className={styles.loginContainer}>
@@ -49,9 +54,14 @@ const LoginForm: React.FC = () => {
             Login
           </Button>
 
-          {/* Forgot Password Link */}
           <div className={styles.forgotPassword}>
-            <Link href="/reset-password">Forgot Password?</Link>
+            {emailValue ? (
+              <Link href={`/reset-password?email=${emailValue}`}>
+                Forgot Password?
+              </Link>
+            ) : (
+              <span className={styles.disabledLink}>Forgot Password?</span>
+            )}
           </div>
         </form>
       </div>

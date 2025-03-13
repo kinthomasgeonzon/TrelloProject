@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useResetPasswordMutation } from "@store/api/authSlice";
 import { useState } from "react";
 import { FieldErrors, useForm, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
 import * as z from "zod";
@@ -19,7 +20,6 @@ const useResetPassword = (): {
   message: string;
   errors: FieldErrors<ResetPasswordFormData>;
 } => {
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
   const {
@@ -30,28 +30,16 @@ const useResetPassword = (): {
     resolver: zodResolver(resetPasswordSchema),
   });
 
+  const [resetPasswordMutation, { isLoading }] = useResetPasswordMutation();
+
   const resetPassword = async (data: ResetPasswordFormData) => {
-    setLoading(true);
     setMessage("");
 
     try {
-      const response = await fetch("http://localhost:4000/auth/reset-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      const resData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(resData.message || "Something went wrong");
-      }
-
+      await resetPasswordMutation(data).unwrap();
       setMessage("A reset link has been sent.");
     } catch (error: any) {
-      setMessage(error.message);
-    } finally {
-      setLoading(false);
+      setMessage(error.data?.message || "Something went wrong");
     }
   };
 
@@ -59,10 +47,10 @@ const useResetPassword = (): {
     register,
     handleSubmit,
     resetPassword,
-    loading,
+    loading: isLoading,
     message,
     errors,
   };
-}
+};
 
 export default useResetPassword;

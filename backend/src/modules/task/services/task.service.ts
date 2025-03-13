@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Status } from '@prisma/client';
 import { PrismaService } from '../../../prisma.service';
 import { CreateTaskDto } from '../dto/req.create-task.dto';
+import { DeleteTaskDto } from '../dto/req.deletetask.dto';
 import { EditTaskDto } from '../dto/req.edittasks.dto';
 import { ResCreateTaskDto } from '../dto/res.create-task.dto';
 import { ResEditTaskDto } from '../dto/res.edittask.dto';
@@ -59,5 +60,20 @@ export class TaskService {
       message: 'Task updated successfully',
       task: updatedTask,
     };
+  }
+
+  async deleteTask(id: number, dto: DeleteTaskDto) {
+    const task = await this.prisma.task.findUnique({ where: { id } });
+    if (!task) {
+      throw new NotFoundException(`Task with ID ${id} not found`);
+    }
+    if (dto.isDeleted) {
+      await this.prisma.task.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
+      return { message: 'Task deleted successfully' };
+    }
+    return { message: 'Task was not deleted' };
   }
 }

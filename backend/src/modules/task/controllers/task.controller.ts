@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -12,6 +13,7 @@ import {
 import { Request } from 'express';
 import { TaskAuthGuard } from '../../guards/task-auth.guard';
 import { CreateTaskDto } from '../dto/req.create-task.dto';
+import { DeleteTaskDto } from '../dto/req.deletetask.dto';
 import { EditTaskDto } from '../dto/req.edittasks.dto';
 import { TaskService } from '../services/task.service';
 
@@ -42,5 +44,12 @@ export class TaskController {
   ) {
     return await this.taskService.editTask(id, dto);
   }
-}
 
+  @Delete(':id')
+  async deleteTask(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: DeleteTaskDto
+  ) {
+    return await this.taskService.deleteTask(id, dto);
+  }
+}

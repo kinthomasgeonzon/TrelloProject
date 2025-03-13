@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Status } from '@prisma/client';
 import { PrismaService } from '../../../prisma.service';
 import { CreateTaskDto } from '../dto/req.create-task.dto';
@@ -37,7 +37,12 @@ export class TaskService {
   }
 
   async editTask(id: number, dto: EditTaskDto): Promise<ResEditTaskDto> {
-    const task = await this.prisma.task.update({
+    const task = await this.prisma.task.findUnique({ where: { id } });
+    if (!task) {
+      throw new NotFoundException(`Task with ID ${id} not found`);
+    }
+
+    const updatedTask = await this.prisma.task.update({
       where: { id },
       data: {
         title: dto.title,
@@ -52,7 +57,7 @@ export class TaskService {
 
     return {
       message: 'Task updated successfully',
-      task,
+      task: updatedTask,
     };
   }
 }

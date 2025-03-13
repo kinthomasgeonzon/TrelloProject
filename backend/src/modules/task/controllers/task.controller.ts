@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Req,
@@ -35,7 +36,11 @@ export class TaskController {
   }
 
   @Patch(':id')
-  async editTask(@Param('id') id: number, @Body() dto: EditTaskDto) {
+  async editTask(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: EditTaskDto
+  ) {
     return await this.taskService.editTask(id, dto);
   }
 }
+

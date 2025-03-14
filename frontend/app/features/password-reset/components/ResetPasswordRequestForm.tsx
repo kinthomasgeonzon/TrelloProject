@@ -17,7 +17,6 @@ const ResetPasswordForm = () => {
         {message && <p className="notification">{message}</p>}
 
         <form onSubmit={handleSubmit(resetPassword)}>
-          {/* Email Input */}
           <Input
             label="Email"
             type="email"
@@ -26,8 +25,6 @@ const ResetPasswordForm = () => {
             errorText={errors.email?.message}
             disabled={loading}
           />
-
-          {/* Submit Button */}
           <Button type="submit" loading={loading}>
             Send Reset Link
           </Button>

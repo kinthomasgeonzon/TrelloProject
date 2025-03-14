@@ -4,34 +4,46 @@ import Button from "@components/button/Button";
 import Input from "@components/input/Input";
 import { useUpdatePasswordMutation } from "@store/api/authSlice";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "../styles/resetPassword.module.css";
 
 const ResetPasswordPage = () => {
   const searchParams = useSearchParams();
-  const token = searchParams ? searchParams.get("token") : null;
-  const router = useRouter(); 
+  const token = searchParams?.get("token");
+  const router = useRouter();
   const [newPassword, setNewPassword] = useState("");
   const [message, setMessage] = useState("");
-  const [isSuccess, setIsSuccess] = useState(false);
 
-  const [updatePassword, { isLoading }] = useUpdatePasswordMutation();
+  const [updatePassword, { isLoading, isSuccess, error }] = useUpdatePasswordMutation();
+
+ 
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token");
+    if (!token) {
+      router.replace("/404");
+    }
+  }, [router]);
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMessage("");
+
+   
 
     try {
-      await updatePassword({ token, newPassword }).unwrap();
+      if (token !== undefined) {
+        await updatePassword({ token, newPassword }).unwrap();
+      } else {
+        setMessage("Invalid token");
+      }
       setMessage("Password updated! Redirecting to login...");
-      setIsSuccess(true);
-
-      setTimeout(() => {
-        router.push("/login");
-      }, 5000);
     } catch (error: any) {
-      setMessage(error.data?.message || "Something went wrong");
-      setIsSuccess(false);
+      if (error?.status === 404 || error?.status === 401) {
+        router.replace("/404");
+      } else {
+        setMessage(error.data?.message || "Something went wrong");
+      }
     }
   };
 
@@ -39,9 +51,11 @@ const ResetPasswordPage = () => {
     <div className={styles.resetPasswordContainer}>
       <div className={styles.resetPasswordBox}>
         <h2 className="title is-4">Enter New Password</h2>
-        {message && <p className={`notification ${isSuccess ? "is-success" : "is-danger"}`}>
-          {message}
-        </p>}
+        {message && (
+          <p className={`notification ${isSuccess ? "is-success" : "is-danger"}`}>
+            {message}
+          </p>
+        )}
 
         <form onSubmit={handleSubmit}>
           <Input
@@ -60,5 +74,5 @@ const ResetPasswordPage = () => {
     </div>
   );
 };
-
 export default ResetPasswordPage;
+

@@ -2,7 +2,7 @@ import { LoginFormData } from "@login/schemas/loginSchema";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { SignupFormData } from "@signup/schemas/signupSchema";
 
-interface ResetPasswordData {
+export interface ResetPasswordData {
   token: string | null;
   newPassword: string;
 }

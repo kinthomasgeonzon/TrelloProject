@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginFormData, loginSchema } from "@login/schemas/loginSchema";
 import styles from "@login/styles/login.module.css";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
 
@@ -22,12 +23,18 @@ const LoginForm: React.FC = () => {
 
   const [loginUser, { isLoading, error }] = useLoginUserMutation();
 
+  const router = useRouter(); 
+
   const onSubmit = async (data: LoginFormData) => {
     try {
       await loginUser(data).unwrap();
       alert("Login successful!");
-    } catch (err) {
-      console.error("Login failed", err);
+    } catch (err: any) {
+      if (err?.status === 404) {
+        router.replace("/404");
+      } else {
+        console.error("Login failed", err);
+      }
     }
   };
 
@@ -56,7 +63,7 @@ const LoginForm: React.FC = () => {
 
           <div className={styles.forgotPassword}>
             {emailValue ? (
-              <Link href={`/reset-password?email=${emailValue}`}>
+              <Link href={`/reset-password`}>
                 Forgot Password?
               </Link>
             ) : (

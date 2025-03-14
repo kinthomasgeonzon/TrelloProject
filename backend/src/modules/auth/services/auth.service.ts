@@ -103,8 +103,12 @@ export class AuthService {
       where: { email },
       data: { passwordResetToken },
     });
+    console.log(
+      `Generated password reset token for ${email}:`,
+      passwordResetToken,
+    );
 
-    const resetLink = `http://localhost:3000/update-password?token=${passwordResetToken}`;
+    const resetLink = `http://localhost:3000/update-password?token=${encodeURIComponent(passwordResetToken)}`;
 
     try {
       await this.resend.emails.send({
@@ -125,16 +129,35 @@ export class AuthService {
       );
     }
   }
+
   async updatePassword({ token, newPassword }: ReqResetPasswordDto) {
     try {
-      const decoded = await this.jwtService.verifyAsync(token);
+      if (!token) {
+        throw new UnauthorizedException('No token provided');
+      }
+
+      const decoded = await this.jwtService
+        .verifyAsync<{ userId: string }>(token)
+        .catch(() => null);
+
+      if (!decoded || !decoded.userId) {
+        throw new UnauthorizedException('Invalid or expired token');
+      }
+
       const user = await this.prisma.user.findUnique({
-        where: { id: decoded.userId },
+        where: { id: Number(decoded.userId) },
       });
 
-      if (!user) throw new NotFoundException('User not found');
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      if (!user.passwordResetToken || user.passwordResetToken !== token) {
+        throw new UnauthorizedException('Invalid or expired token');
+      }
 
       const hashedPassword = await bcrypt.hash(newPassword, 10);
+
       await this.prisma.user.update({
         where: { id: user.id },
         data: { password: hashedPassword, passwordResetToken: null },

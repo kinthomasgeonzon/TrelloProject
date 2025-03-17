@@ -2,6 +2,8 @@
 
 import Button from "@components/button/Button";
 import Input from "@components/input/Input";
+import Modal from "@components/modal/Modal";
+import { useCreateTaskMutation } from "@store/api/taskSlice";
 import { useState } from "react";
 import styles from "../styles/createTaskForm.module.css";
 
@@ -11,9 +13,11 @@ export default function CreateTaskForm() {
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [assignedTo, setAssignedTo] = useState<number | "">("");
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+
+  const [createTask, { isLoading }] = useCreateTaskMutation();
 
   const handleCreateTask = async () => {
     if (!title.trim()) {
@@ -21,32 +25,21 @@ export default function CreateTaskForm() {
       return;
     }
 
-    setLoading(true);
     setError("");
     setSuccess("");
 
     try {
-      const response = await fetch("http://localhost:4000/tasks", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({
-          title,
-          description,
-          dueDate: dueDate ? new Date(dueDate).toISOString() : null,
-          status: "TODO",
-          createdBy: 1,
-          assignedTo: assignedTo || null,
-          taskOrder: 1,
-        }),
-      });
+      await createTask({
+        title,
+        description,
+        dueDate: dueDate ? new Date(dueDate).toISOString() : null,
+        status: "TODO",
+        createdBy: 1,
+        assignedTo: assignedTo || null,
+        taskOrder: 1,
+      }).unwrap();
 
-      if (!response.ok) throw new Error("Failed to create task");
-
-      setSuccess("Task successfully created! 🎉");
-
+      setSuccess("Task successfully created! ");
       setTitle("");
       setDescription("");
       setDueDate("");
@@ -55,28 +48,16 @@ export default function CreateTaskForm() {
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
       setError("Error creating task");
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
     <>
-      {}
       <div className={styles.sidebarToggle} onClick={() => setIsOpen(true)}>
         ➕
       </div>
 
-      {}
-      {isOpen && (
-        <div className={styles.backdrop} onClick={() => setIsOpen(false)}></div>
-      )}
-
-      {}
-      <div className={`${styles.sidebar} ${isOpen ? styles.open : ""}`}>
-        <button className={styles.closeButton} onClick={() => setIsOpen(false)}>
-          ✖
-        </button>
+      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
         <h3 className={styles.title}>Create Task</h3>
 
         {error && <div className={styles.notificationDanger}>{error}</div>}
@@ -110,11 +91,13 @@ export default function CreateTaskForm() {
         />
 
         <div className={styles.buttonWrapper}>
-          <Button loading={loading} onClick={handleCreateTask}>
-            {loading ? "Creating..." : "Create Task"}
+          <Button loading={isLoading} onClick={handleCreateTask}>
+            {isLoading ? "Creating..." : "Create Task"}
           </Button>
         </div>
-      </div>
+      </Modal>
     </>
   );
 }
+
+

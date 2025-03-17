@@ -33,13 +33,16 @@ const useResetPassword = (): {
   const [resetPasswordMutation, { isLoading }] = useResetPasswordMutation();
 
   const resetPassword = async (data: ResetPasswordFormData) => {
-    setMessage("");
+    setMessage(""); 
 
     try {
       await resetPasswordMutation(data).unwrap();
       setMessage("A reset link has been sent.");
     } catch (error: any) {
+      console.error("Error resetting password:", error);
       setMessage(error.data?.message || "Something went wrong");
+    } finally {
+      console.log("Reset password request finished.");
     }
   };
 

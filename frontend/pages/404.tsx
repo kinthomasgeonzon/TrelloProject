@@ -1,6 +1,6 @@
 "use client";
 
-import NotFoundPage from "@components/404page/404 Page";
+import NotFoundPage from "@/app/components/404page/NotFoundPage";
 
 export default function Error() {
   return <NotFoundPage />;

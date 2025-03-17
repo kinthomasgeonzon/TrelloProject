@@ -15,21 +15,9 @@ const ResetPasswordPage = () => {
   const [message, setMessage] = useState("");
 
   const [updatePassword, { isLoading, isSuccess, error }] = useUpdatePasswordMutation();
-
  
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("token");
-    if (!token) {
-      router.replace("/404");
-    }
-  }, [router]);
-  
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-   
 
     try {
       if (token !== undefined) {
@@ -46,6 +34,14 @@ const ResetPasswordPage = () => {
       }
     }
   };
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token");
+    if (!token) {
+      router.replace("/404");
+    }
+  }, [router]);
 
   return (
     <div className={styles.resetPasswordContainer}>
@@ -75,4 +71,3 @@ const ResetPasswordPage = () => {
   );
 };
 export default ResetPasswordPage;
-

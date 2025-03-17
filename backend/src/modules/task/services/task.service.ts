@@ -14,8 +14,8 @@ export class TaskService {
         title: dto.title,
         description: dto.description || null,
         dueDate: dto.dueDate || null,
-        status: Status.TODO, 
-        taskOrder: 0, 
+        status: Status.TODO,
+        taskOrder: 0,
         createdBy: dto.createdBy,
       },
     });
@@ -25,9 +25,14 @@ export class TaskService {
       task,
     };
   }
-  
+
   async getAllTasks() {
-    const tasks = await this.prisma.task.findMany();
+    const tasks = await this.prisma.task.findMany({
+      where: {
+        deletedAt: null, 
+      },
+    });
+
     return {
       message: 'All tasks retrieved successfully',
       tasks,

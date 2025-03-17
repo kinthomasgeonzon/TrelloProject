@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useEffect, useState } from "react";
 import styles from "../styles/kanban.module.css";
 import CreateTaskForm from "./CreateTaskForm";
@@ -22,9 +21,12 @@ const KanbanBoard: React.FC = () => {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         if (!response.ok) throw new Error("Failed to fetch tasks");
-        setTasks(await response.json());
+
+        const data = await response.json();
+        setTasks(data.tasks); 
       } catch (error) {
         console.error(error);
+        setTasks([]); 
       }
     })();
   }, []);
@@ -34,7 +36,6 @@ const KanbanBoard: React.FC = () => {
       <div className={`${styles.sidebar} ${showSidebar ? styles.show : ""}`}>
         <CreateTaskForm />
       </div>
-
       <div className={styles.kanbanBoard}>
         {["TODO", "IN_PROGRESS", "DONE"].map((status) => (
           <div key={status} className={styles.column}>

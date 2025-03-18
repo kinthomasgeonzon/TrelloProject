@@ -17,7 +17,9 @@ export const authApi = createApi({
         headers: { "Content-Type": "application/json" },
       }),
     }),
-    loginUser: builder.mutation<void, LoginFormData>({
+    loginUser: builder.mutation<{
+        user: any; token: string; role: string 
+}, LoginFormData>({ 
       query: (userData) => ({
         url: "/login", 
         method: "POST",

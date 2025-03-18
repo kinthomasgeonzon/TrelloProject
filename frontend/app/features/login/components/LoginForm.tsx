@@ -10,7 +10,11 @@ import { useForm } from "react-hook-form";
 
 const LoginForm: React.FC = () => {
   const router = useRouter();
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
 
@@ -21,8 +25,9 @@ const LoginForm: React.FC = () => {
       const response = await loginUser(data).unwrap();
       console.log("Login Successful:", response);
 
-      const userRole = response.user?.role ?? "MEMBER"; 
+      const userRole = response.user?.role ?? "MEMBER";
       localStorage.setItem("userRole", userRole);
+      localStorage.setItem("token", response.token); 
 
       router.push(userRole === "ADMIN" ? "/kanban" : "/index");
     } catch (err) {
@@ -36,9 +41,20 @@ const LoginForm: React.FC = () => {
       <div className={styles.loginBox}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <h2>Login</h2>
-          <Input label="Email" {...register("email")} errorText={errors.email?.message} />
-          <Input label="Password" type="password" {...register("password")} errorText={errors.password?.message} />
-          <Button type="submit" loading={isLoading}>Login</Button>
+          <Input
+            label="Email"
+            {...register("email")}
+            errorText={errors.email?.message}
+          />
+          <Input
+            label="Password"
+            type="password"
+            {...register("password")}
+            errorText={errors.password?.message}
+          />
+          <Button type="submit" loading={isLoading}>
+            Login
+          </Button>
         </form>
       </div>
     </div>

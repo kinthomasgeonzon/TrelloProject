@@ -12,15 +12,22 @@ export const tasksApi = createApi({
       return headers;
     },
   }),
+  tagTypes: ["Tasks"], 
   endpoints: (builder) => ({
+    getAllTasks: builder.query<{ tasks: any[] }, void>({
+      query: () => "tasks",
+      transformResponse: (response: { tasks: any[] }) => ({ tasks: response.tasks || [] }),
+      providesTags: ["Tasks"], 
+    }),
     createTask: builder.mutation({
       query: (taskData) => ({
         url: "tasks",
         method: "POST",
         body: taskData,
       }),
+      invalidatesTags: ["Tasks"], 
     }),
   }),
 });
 
-export const { useCreateTaskMutation } = tasksApi;
+export const { useGetAllTasksQuery, useCreateTaskMutation } = tasksApi;

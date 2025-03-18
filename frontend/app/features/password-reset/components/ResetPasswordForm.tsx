@@ -13,42 +13,44 @@ const ResetPasswordPage = () => {
   const router = useRouter();
   const [newPassword, setNewPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
 
-  const [updatePassword, { isLoading, isSuccess, error }] = useUpdatePasswordMutation();
- 
+  const [updatePassword, { isLoading }] = useUpdatePasswordMutation();
+
+  useEffect(() => {
+    if (!token) {
+      router.replace("/404");
+    }
+  }, [token, router]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setMessage("");
+    setIsError(false);
 
     try {
-      if (token !== undefined) {
-        await updatePassword({ token, newPassword }).unwrap();
-      } else {
-        setMessage("Invalid token");
-      }
+      if (!token) throw new Error("Invalid or missing token");
+
+      await updatePassword({ token, newPassword }).unwrap();
       setMessage("Password updated! Redirecting to login...");
     } catch (error: any) {
+      setIsError(true);
       if (error?.status === 404 || error?.status === 401) {
         router.replace("/404");
       } else {
         setMessage(error.data?.message || "Something went wrong");
       }
+    } finally {
+      setNewPassword(""); // Clear input field after attempt
     }
   };
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("token");
-    if (!token) {
-      router.replace("/404");
-    }
-  }, [router]);
 
   return (
     <div className={styles.resetPasswordContainer}>
       <div className={styles.resetPasswordBox}>
         <h2 className="title is-4">Enter New Password</h2>
         {message && (
-          <p className={`notification ${isSuccess ? "is-success" : "is-danger"}`}>
+          <p className={`notification ${isError ? "is-danger" : "is-success"}`}>
             {message}
           </p>
         )}
@@ -70,4 +72,5 @@ const ResetPasswordPage = () => {
     </div>
   );
 };
+
 export default ResetPasswordPage;

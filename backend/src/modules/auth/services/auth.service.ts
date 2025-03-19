@@ -11,6 +11,7 @@ import * as bcrypt from 'bcryptjs';
 import { Resend } from 'resend';
 import { PrismaService } from '../../../prisma.service';
 import { ReqLoginDto } from '../dtos/req.login.dto';
+import { ReqResetPasswordDto } from '../dtos/req.reset-password.dto';
 import { ReqSignupDto } from '../dtos/req.signup.dto';
 import { ResSignupDto } from '../dtos/res.signup.dto';
 
@@ -103,8 +104,12 @@ export class AuthService {
       where: { email },
       data: { passwordResetToken },
     });
+    console.log(
+      `Generated password reset token for ${email}:`,
+      passwordResetToken,
+    );
 
-    const resetLink = `http://localhost:3000/auth/reset-password?token=${passwordResetToken}`;
+    const resetLink = `http://localhost:3000/update-password?token=${encodeURIComponent(passwordResetToken)}`;
 
     try {
       await this.resend.emails.send({
@@ -123,6 +128,45 @@ export class AuthService {
       throw new InternalServerErrorException(
         'Failed to send email. Please try again later.',
       );
+    }
+  }
+
+  async updatePassword({ token, newPassword }: ReqResetPasswordDto) {
+    try {
+      if (!token) {
+        throw new UnauthorizedException('No token provided');
+      }
+
+      const decoded = await this.jwtService
+        .verifyAsync<{ userId: string }>(token)
+        .catch(() => null);
+
+      if (!decoded || !decoded.userId) {
+        throw new UnauthorizedException('Invalid or expired token');
+      }
+
+      const user = await this.prisma.user.findUnique({
+        where: { id: Number(decoded.userId) },
+      });
+
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      if (!user.passwordResetToken || user.passwordResetToken !== token) {
+        throw new UnauthorizedException('Invalid or expired token');
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { password: hashedPassword, passwordResetToken: null },
+      });
+
+      return { message: 'Password updated successfully' };
+    } catch {
+      throw new UnauthorizedException('Invalid or expired token');
     }
   }
 }

@@ -26,6 +26,7 @@
       "@features/*": ["app/features/*"],
       "@signup/*": ["app/features/signup/*"],
       "@store/*": ["app/store/*"],
+      "@password-reset/*": ["app/features/password-reset/*"],
       "@login/*": ["app/features/login/*"],
       "@kanban/*": ["app/features/kanban/*"],
     }

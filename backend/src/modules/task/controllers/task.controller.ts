@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { TaskAuthGuard } from '../../guards/task-auth.guard';
 import { CreateTaskDto } from '../dto/req.create-task.dto';
@@ -17,5 +17,10 @@ export class TaskController {
   async create(@Req() req: AuthenticatedRequest, @Body() dto: CreateTaskDto) {
     const user = req.user;
     return await this.taskService.createTask({ ...dto, createdBy: user.id });
+  }
+
+  @Get()
+  async getAll() {
+    return await this.taskService.getAllTasks();
   }
 }

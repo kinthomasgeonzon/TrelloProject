@@ -30,7 +30,6 @@ const ResetPasswordPage = () => {
 
     try {
       if (!token) throw new Error("Invalid or missing token");
-
       await updatePassword({ token, newPassword }).unwrap();
       setMessage("Password updated! Redirecting to login...");
     } catch (error: any) {
@@ -39,9 +38,7 @@ const ResetPasswordPage = () => {
         router.replace("/404");
       } else {
         setMessage(error.data?.message || "Something went wrong");
-      }
-    } finally {
-      setNewPassword(""); // Clear input field after attempt
+      } 
     }
   };
 

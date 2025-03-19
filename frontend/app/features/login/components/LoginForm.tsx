@@ -19,17 +19,15 @@ const LoginForm: React.FC = () => {
   });
 
   const [loginUser, { isLoading }] = useLoginUserMutation();
-
   const onSubmit = async (data: LoginFormData) => {
     try {
       const response = await loginUser(data).unwrap();
-      console.log("Login Successful:", response);
 
       const userRole = response.user?.role ?? "MEMBER";
       localStorage.setItem("userRole", userRole);
       localStorage.setItem("token", response.token); 
 
-      router.push(userRole === "ADMIN" ? "/kanban" : "/index");
+      router.push(userRole === "ADMIN" ? "/kanban" : "/kanban");
     } catch (err) {
       console.error("Login Failed:", err);
       alert("Invalid email or password.");

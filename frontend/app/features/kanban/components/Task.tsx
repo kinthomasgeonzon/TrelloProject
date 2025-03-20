@@ -10,5 +10,4 @@ const Task: React.FC<TaskProps> = ({ title }) => {
 };
 
 export default Task;
-
 // placeholder for now

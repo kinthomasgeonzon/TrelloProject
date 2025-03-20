@@ -1,4 +1,5 @@
 "use client";
+
 import Button from "@/app/components/button/Button";
 import Input from "@/app/components/input/Input";
 import { useLoginUserMutation } from "@/app/store/api/authSlice";
@@ -22,14 +23,12 @@ const LoginForm: React.FC = () => {
 
   const [loginUser, { isLoading, error }] = useLoginUserMutation();
   const router = useRouter(); 
-  const emailValue = watch("email");
 
   const onSubmit = async (data: LoginFormData) => {
     try {
       const response = await loginUser(data).unwrap();
       localStorage.setItem("userRole", response.user?.role ?? "MEMBER");
       localStorage.setItem("token", response.token);
-
       router.push("/kanban");
     } catch (err: any) {
       if (err?.status === 404) {
@@ -40,6 +39,8 @@ const LoginForm: React.FC = () => {
       }
     }
   };
+
+  const emailValue = watch("email");
 
   return (
     <div className={styles.loginContainer}>
@@ -57,13 +58,16 @@ const LoginForm: React.FC = () => {
             {...register("password")}
             errorText={errors.password?.message}
           />
+          {error && <p className={styles.error}>Invalid credentials</p>}
           <Button type="submit" loading={isLoading}>
             Login
           </Button>
-          {error && <p className={styles.error}>Invalid credentials</p>}
+
           <div className={styles.forgotPassword}>
             {emailValue ? (
-              <Link href="/reset-password">Forgot Password?</Link>
+              <Link href={`/reset-password`}>
+                Forgot Password?
+              </Link>
             ) : (
               <span className={styles.disabledLink}>Forgot Password?</span>
             )}

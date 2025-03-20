@@ -22,18 +22,20 @@ const LoginForm: React.FC = () => {
   });
 
   const [loginUser, { isLoading, error }] = useLoginUserMutation();
-
-  const router = useRouter(); 
+  const router = useRouter();
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await loginUser(data).unwrap();
-      alert("Login successful!");
+      const response = await loginUser(data).unwrap();
+      localStorage.setItem("userRole", response.user?.role ?? "MEMBER");
+      localStorage.setItem("token", response.token);
+      router.push("/kanban");
     } catch (err: any) {
       if (err?.status === 404) {
         router.replace("/404");
       } else {
         console.error("Login failed", err);
+        alert("Invalid email or password.");
       }
     }
   };

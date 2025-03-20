@@ -8,15 +8,15 @@
   font-weight: 600;
   margin-bottom: 5px;
   font-size: 14px;
-  color: #333;
+  color: #ffffff; 
 }
 
 .input {
   padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  border: 1px solid #444; 
   font-size: 14px;
-  transition: all 0.2s ease-in-out;
+  background-color: #f7f7f7;
+  color: #444444; 
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 

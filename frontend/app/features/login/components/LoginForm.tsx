@@ -22,7 +22,7 @@ const LoginForm: React.FC = () => {
   });
 
   const [loginUser, { isLoading, error }] = useLoginUserMutation();
-  const router = useRouter(); 
+  const router = useRouter();
 
   const onSubmit = async (data: LoginFormData) => {
     try {

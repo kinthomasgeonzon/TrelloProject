@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -31,6 +32,7 @@ export class TaskController {
   ) {
     return await this.taskService.editTask(id, dto);
   }
+
   @Post()
   async create(@Req() req: AuthenticatedRequest, @Body() dto: CreateTaskDto) {
     const user = req.user;
@@ -40,5 +42,10 @@ export class TaskController {
   @Get()
   async getAll() {
     return await this.taskService.getAllTasks();
+  }
+
+  @Delete(':id')
+  async deleteTask(@Param('id', ParseIntPipe) id: number) {
+    return await this.taskService.deleteTask(id);
   }
 }

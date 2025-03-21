@@ -27,9 +27,13 @@ const LoginForm: React.FC = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       const response = await loginUser(data).unwrap();
-      localStorage.setItem("userRole", response.user?.role ?? "MEMBER");
+      console.log("Login Successful:", response);
+
+      const userRole = response.user?.role ?? "MEMBER";
+      localStorage.setItem("userRole", userRole);
       localStorage.setItem("token", response.token);
-      router.push("/kanban");
+
+      router.push(userRole === "ADMIN" ? "/kanban" : "/index");
     } catch (err: any) {
       if (err?.status === 404) {
         router.replace("/404");

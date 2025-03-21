@@ -23,15 +23,7 @@ interface AuthenticatedRequest extends Request {
 @Controller('tasks')
 @UseGuards(TaskAuthGuard)
 export class TaskController {
-  constructor(private readonly taskService: TaskService) {}
-
-  @Patch(':id')
-  async editTask(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: EditTaskDto,
-  ) {
-    return await this.taskService.editTask(id, dto);
-  }
+  constructor(private readonly taskService: TaskService) { }
 
   @Post()
   async create(@Req() req: AuthenticatedRequest, @Body() dto: CreateTaskDto) {
@@ -42,6 +34,14 @@ export class TaskController {
   @Get()
   async getAll() {
     return await this.taskService.getAllTasks();
+  }
+
+  @Patch(':id')
+  async editTask(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: EditTaskDto,
+  ) {
+    return await this.taskService.editTask(id, dto);
   }
 
   @Delete(':id')

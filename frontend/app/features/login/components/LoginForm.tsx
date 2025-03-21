@@ -12,6 +12,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 
 const LoginForm: React.FC = () => {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -22,19 +23,21 @@ const LoginForm: React.FC = () => {
   });
 
   const [loginUser, { isLoading, error }] = useLoginUserMutation();
-  const router = useRouter();
 
   const onSubmit = async (data: LoginFormData) => {
     try {
       const response = await loginUser(data).unwrap();
-      localStorage.setItem("userRole", response.user?.role ?? "MEMBER");
+
+      const userRole = response.user?.role ?? "MEMBER";
+      localStorage.setItem("userRole", userRole);
       localStorage.setItem("token", response.token);
-      router.push("/kanban");
+
+      router.push(userRole === "ADMIN" ? "/kanban" : "/kanban");
     } catch (err: any) {
       if (err?.status === 404) {
         router.replace("/404");
       } else {
-        console.error("Login failed", err);
+        console.error("Login Failed:", err);
         alert("Invalid email or password.");
       }
     }
@@ -65,9 +68,7 @@ const LoginForm: React.FC = () => {
 
           <div className={styles.forgotPassword}>
             {emailValue ? (
-              <Link href={`/reset-password`}>
-                Forgot Password?
-              </Link>
+              <Link href="/reset-password">Forgot Password?</Link>
             ) : (
               <span className={styles.disabledLink}>Forgot Password?</span>
             )}

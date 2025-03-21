@@ -1,80 +1,81 @@
 .sidebarToggle {
-    position: fixed;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    background: #007bff;
-    color: white;
-    padding: 10px 15px;
-    border-radius: 0 8px 8px 0;
-    cursor: pointer;
-    font-size: 1.5rem;
-    transition: background 0.3s;
-  }
-  
-  .sidebarToggle:hover {
-    background: #0056b3;
-  }
-  
-  .backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 999;
-  }
-  
-  .sidebar {
-    position: fixed;
-    left: -300px;
-    top: 0;
-    width: 300px;
-    height: 100%;
-    background: #f8f9fa;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    transition: left 0.3s ease-in-out;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .sidebar.open {
-    left: 0;
-  }
-  
-  .closeButton {
-    background: none;
-    border: none;
-    color: #333;
-    font-size: 1.5rem;
-    cursor: pointer;
-    align-self: flex-end;
-  }
-  
-  .title {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
-  
-  .notificationDanger {
-    background: #ffcccc;
-    color: #900;
-    padding: 10px;
-    border-radius: 5px;
-  }
-  
-  .notificationSuccess {
-    background: #ccffcc;
-    color: #090;
-    padding: 10px;
-    border-radius: 5px;
-  }
-  
-  .buttonWrapper {
-    margin-top: 10px;
-  }
+  position: fixed;
+  left: -50px;
+  top: 20%;
+  transform: translateY(-50%);
+  background: #069e12;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 0 8px 8px 0;
+  cursor: pointer;
+  font-size: 1.5rem;
+  transition: left 0.3s ease-in-out, background 0.3s;
+}
+
+.sidebarToggle:hover {
+  background: #024613;
+  left: 0;
+}
+
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.sidebar {
+  position: fixed;
+  left: -300px;
+  top: 0;
+  width: 300px;
+  height: 100%;
+  background: #f8f9fa;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  transition: left 0.3s ease-in-out;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 1.5rem;
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+.title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.notificationDanger {
+  background: #ffcccc;
+  color: #900;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.notificationSuccess {
+  background: #ccffcc;
+  color: #090;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.buttonWrapper {
+  margin-top: 10px;
+}

@@ -7,9 +7,11 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { Status } from '@prisma/client';
 import { Request } from 'express';
 import { TaskAuthGuard } from '../../guards/task-auth.guard';
 import { CreateTaskDto } from '../dto/req.create-task.dto';
@@ -40,8 +42,36 @@ export class TaskController {
   }
 
   @Get()
-  async getAll() {
-    return await this.taskService.getAllTasks();
+  async getAllTasks(
+    @Query('status') status?: string, 
+    @Query('createdBy') createdBy?: string,
+    @Query('assignedTo') assignedTo?: string,
+  ) {
+    const where: any = { deletedAt: null };
+
+    if (
+      status &&
+      status !== 'ALL' &&
+      Object.values(Status).includes(status as Status)
+    ) {
+      where.status = status as Status;
+    }
+
+    if (createdBy) {
+      const createdByInt = parseInt(createdBy, 10);
+      if (!isNaN(createdByInt)) where.createdBy = createdByInt;
+    }
+    if (assignedTo) {
+      const assignedToInt = parseInt(assignedTo, 10);
+      if (!isNaN(assignedToInt)) where.assignedTo = assignedToInt;
+    }
+
+    const tasks = await this.taskService.getAllTasks(where);
+
+    return {
+      message: 'All tasks retrieved successfully',
+      tasks,
+    };
   }
 
   @Delete(':id')

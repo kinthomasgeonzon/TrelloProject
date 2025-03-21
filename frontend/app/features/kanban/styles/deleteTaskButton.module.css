@@ -1,0 +1,16 @@
+.delete-button {
+    background-color: #b62e2e;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity .5s ease;
+    padding: 12px;
+  }
+  
+  .delete-button:hover {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+  
+  .delete-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }

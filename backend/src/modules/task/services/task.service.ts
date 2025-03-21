@@ -8,19 +8,23 @@ import { ResEditTaskDto } from '../dto/res.edittask.dto';
 
 @Injectable()
 export class TaskService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async editTask(id: number, dto: EditTaskDto): Promise<ResEditTaskDto> {
-    const task = await this.prisma.task.findUnique({ where: { id } });
+    const task = await this.prisma.task.findUnique({
+      where: { id, deletedAt: null },
+    });
 
     if (!task) {
-      throw new NotFoundException(`Task with ID ${id} not found`);
+      throw new NotFoundException(
+        `Task with ID ${id} not found or has been deleted`,
+      );
     }
 
     const updatedTask = await this.prisma.task.update({
       where: { id },
       data: {
-        title: dto.title,
+        title: dto.title ?? task.title,
         description: dto.description ?? task.description,
         dueDate: dto.dueDate ?? task.dueDate,
         status: dto.status ?? task.status,
@@ -47,6 +51,7 @@ export class TaskService {
         taskOrder: dto.taskOrder ?? 0,
         createdBy: dto.createdBy,
         updatedAt: new Date(),
+        deletedAt: null,
       },
     });
 
@@ -56,29 +61,25 @@ export class TaskService {
     };
   }
 
-  async getAllTasks() {
-    const tasks = await this.prisma.task.findMany({
-      where: {
-        deletedAt: null,
-      },
+  async getAllTasks(where: any) {
+    return await this.prisma.task.findMany({
+      where: { ...where, deletedAt: null }, 
+      orderBy: { createdAt: 'desc' }, 
     });
-
-    return {
-      message: 'All tasks retrieved successfully',
-      tasks,
-    };
   }
 
   async deleteTask(id: number) {
-    const task = await this.prisma.task.findUnique({ where: { id } });
+    const task = await this.prisma.task.findUnique({
+      where: { id, deletedAt: null },
+    });
 
     if (!task) {
-      throw new NotFoundException(`Task with ID ${id} not found`);
+      throw new NotFoundException(`Task with ID ${id} not found or already deleted`);
     }
 
     await this.prisma.task.update({
       where: { id },
-      data: { deletedAt: new Date() },
+      data: { deletedAt: new Date(), updatedAt: new Date() },
     });
 
     return { message: 'Task soft deleted successfully' };

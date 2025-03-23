@@ -9,7 +9,6 @@ export class TaskAuthGuard extends AuthGuard('jwt') {
       throw new UnauthorizedException('Unauthorized access');
     }
 
-    // Check if the user has the appropriate role to access task-related operations
     if (user.role !== 'ADMIN' && user.role !== 'MEMBER') {
       throw new ForbiddenException('Access denied: Only Admins and Members are allowed');
     }

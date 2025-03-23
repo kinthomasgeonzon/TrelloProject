@@ -1,9 +1,9 @@
 .sidebarToggle {
     position: fixed;
     left: 0;
-    top: 50%;
+    top: 30%;
     transform: translateY(-50%);
-    background: #007bff;
+    background: #069e12;
     color: white;
     padding: 10px 15px;
     border-radius: 0 8px 8px 0;
@@ -13,7 +13,7 @@
   }
   
   .sidebarToggle:hover {
-    background: #0056b3;
+    background: #024613;
   }
   
   .backdrop {

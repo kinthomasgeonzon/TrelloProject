@@ -8,24 +8,25 @@ import { ResEditTaskDto } from '../dto/res.edittask.dto';
 
 @Injectable()
 export class TaskService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async editTask(id: number, dto: EditTaskDto): Promise<ResEditTaskDto> {
-    const task = await this.prisma.task.findUnique({ where: { id } });
+    const task = await this.prisma.task.findUnique({
+      where: { id, deletedAt: null },
+    });
 
     if (!task) {
-      throw new NotFoundException(`Task with ID ${id} not found`);
+      throw new NotFoundException(`Task with ID ${id} not found or has been deleted`);
     }
 
     const updatedTask = await this.prisma.task.update({
       where: { id },
       data: {
-        title: dto.title,
+        title: dto.title ?? task.title,
         description: dto.description ?? task.description,
         dueDate: dto.dueDate ?? task.dueDate,
         status: dto.status ?? task.status,
         assignedTo: dto.assignedTo ?? task.assignedTo,
-        taskOrder: dto.taskOrder ?? task.taskOrder,
         updatedAt: new Date(),
       },
     });
@@ -37,6 +38,13 @@ export class TaskService {
   }
 
   async createTask(dto: CreateTaskDto): Promise<ResCreateTaskDto> {
+    const lastTask = await this.prisma.task.findFirst({
+      where: { status: Status.TODO, deletedAt: null },
+      orderBy: { taskOrder: 'desc' },
+    });
+
+    const newTaskOrder = lastTask ? lastTask.taskOrder + 1 : 1;
+
     const task = await this.prisma.task.create({
       data: {
         title: dto.title,
@@ -44,9 +52,10 @@ export class TaskService {
         dueDate: dto.dueDate ?? null,
         status: Status.TODO,
         assignedTo: dto.assignedTo ?? null,
-        taskOrder: dto.taskOrder ?? 0,
+        taskOrder: newTaskOrder,
         createdBy: dto.createdBy,
         updatedAt: new Date(),
+        deletedAt: null,
       },
     });
 
@@ -56,31 +65,69 @@ export class TaskService {
     };
   }
 
-  async getAllTasks() {
-    const tasks = await this.prisma.task.findMany({
-      where: {
-        deletedAt: null,
-      },
+  async getAllTasks(where: any) {
+    return await this.prisma.task.findMany({
+      where: { ...where, deletedAt: null },
+      orderBy: { taskOrder: 'asc' },
     });
-
-    return {
-      message: 'All tasks retrieved successfully',
-      tasks,
-    };
   }
 
   async deleteTask(id: number) {
+    const task = await this.prisma.task.findUnique({
+      where: { id, deletedAt: null },
+    });
+
+    if (!task) {
+      throw new NotFoundException(`Task with ID ${id} not found or already deleted`);
+    }
+
+    await this.prisma.task.update({
+      where: { id },
+      data: { deletedAt: new Date(), updatedAt: new Date() },
+    });
+
+    return { message: 'Task soft deleted successfully' };
+  }
+
+  async updateTaskStatus(id: number, newStatus: Status): Promise<ResEditTaskDto> {
     const task = await this.prisma.task.findUnique({ where: { id } });
 
     if (!task) {
       throw new NotFoundException(`Task with ID ${id} not found`);
     }
 
-    await this.prisma.task.update({
+    const updatedTask = await this.prisma.task.update({
       where: { id },
-      data: { deletedAt: new Date() },
+      data: {
+        status: newStatus,
+        updatedAt: new Date(),
+      },
     });
 
-    return { message: 'Task soft deleted successfully' };
+    return {
+      message: 'Task status updated successfully',
+      task: updatedTask,
+    };
   }
+
+  async updateTaskOrder(id: number, taskOrder: number) {
+    const task = await this.prisma.task.findUnique({
+      where: { id, deletedAt: null },
+    });
+  
+    if (!task) {
+      throw new NotFoundException(`Task with ID ${id} not found or deleted`);
+    }
+  
+    const updatedTask = await this.prisma.task.update({
+      where: { id },
+      data: { taskOrder, updatedAt: new Date() },
+    });
+  
+    return {
+      message: 'Task order updated successfully',
+      task: updatedTask,
+    };
+  }
+  
 }

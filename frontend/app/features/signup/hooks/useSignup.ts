@@ -4,10 +4,12 @@ import { useSignupUserMutation } from "@/app/store/api/authSlice";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { SignupFormData, signupSchema } from "@signup/schemas/signupSchema";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 export const useSignup = () => {
+  const router = useRouter();
   const [signupUser, { isLoading: loading, isSuccess: success }] = useSignupUserMutation();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -15,6 +17,7 @@ export const useSignup = () => {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
   });
@@ -31,13 +34,19 @@ export const useSignup = () => {
 
   const onSubmit = async (data: SignupFormData) => {
     try {
-      setErrorMessage(null); 
+      setErrorMessage(null);
       await signupUser(data).unwrap();
+      reset();
+      router.replace("/kanban");
     } catch (err) {
       console.error("Signup failed:", err);
-      setErrorMessage(getErrorMessage(err)); 
+      setErrorMessage(getErrorMessage(err));
     }
   };
+
+  useEffect(() => {
+    document.title = "Sign Up | TaskMan";
+  }, []);
 
   return {
     register,
@@ -46,6 +55,6 @@ export const useSignup = () => {
     onSubmit,
     loading,
     success,
-    error: errorMessage, 
+    error: errorMessage,
   };
 };

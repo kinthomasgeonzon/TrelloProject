@@ -1,23 +1,35 @@
 "use client";
 
+import { DragDropContext } from "@hello-pangea/dnd";
+import { useGetAllTasksQuery } from "@store/api/taskSlice";
+import { useAuth } from "../hooks/useAuth";
+import { useTaskDragAndDrop } from "../hooks/useTaskDragAndDrop";
+import { useTaskFilters } from "../hooks/useTaskFilters";
 import styles from "../styles/kanban.module.css";
-import CreateTaskForm from "./CreateTaskForm";
+import DroppableColumn from "./Column";
+import LogoutButton from "./LogOut";
+import Sidebar from "./Sidebar";
+import TaskFilter from "./TaskFilter";
 
 const KanbanBoard: React.FC = () => {
-  return (
-    <div className={styles.kanbanContainer}>
-      <div className={styles.sidebar}>
-        <CreateTaskForm />
-      </div>
+  const { register, filters } = useTaskFilters();
+  const { data: tasks = [] } = useGetAllTasksQuery(filters);
+  const { onDragEnd } = useTaskDragAndDrop();
+  const { userRole } = useAuth();
 
-      <div className={styles.kanbanBoard}>
-        {["TODO", "IN_PROGRESS", "DONE"].map((status) => (
-          <div key={status} className={styles.column}>
-            <h3 className={styles.columnTitle}>{status.replace("_", " ")}</h3>
-          </div>
-        ))}
+  return (
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div className={styles.kanbanContainer}>
+        <LogoutButton />
+        <Sidebar userRole={userRole} />
+        <TaskFilter register={register} tasks={tasks} />
+        <div className={`${styles.kanbanBoard} columns is-variable is-4`}>
+          {["TODO", "IN_PROGRESS", "DONE"].map((status) => (
+            <DroppableColumn key={status} status={status} tasks={tasks} />
+          ))}
+        </div>
       </div>
-    </div>
+    </DragDropContext>
   );
 };
 

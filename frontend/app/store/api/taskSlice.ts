@@ -9,30 +9,45 @@ const baseQuery = fetchBaseQuery({
       headers.set("Authorization", `Bearer ${token}`);
     }
     return headers;
-  }  
+  },
 });
 
 export const tasksApi = createApi({
   reducerPath: "tasksApi",
   baseQuery,
-  tagTypes: ["Tasks"],
+  tagTypes: ["Tasks", "Users"],
   endpoints: (builder) => ({
-    getAllTasks: builder.query<any[], Partial<{ status: string; createdBy: string; assignedTo: string }>>({
+    getAllTasks: builder.query<
+      any[],
+      Partial<{ status: string; createdBy: string; assignedTo: string }>
+    >({
       query: (filters) => {
         const filteredParams = Object.fromEntries(
-          Object.entries(filters || {}).filter(([_, value]) => value !== "ALL")
+          Object.entries(filters || {}).filter(([_, value]) => value && value !== "ALL")
         );
 
         return {
           url: "tasks",
+          method: "GET",
           params: filteredParams,
         };
       },
-      transformResponse: (response: any) => {
-        if (!response) return [];
-        return Array.isArray(response.tasks) ? response.tasks : response;
-      },
+      transformResponse: (response: any) =>
+        response?.tasks.map((task: any) => ({
+          ...task,
+          createdBy: task.createdBy || null,
+          assignedTo: task.assignedTo || null,
+        })) ?? [],
       providesTags: ["Tasks"],
+    }),
+
+    getAllUsers: builder.query<{ id: number; name: string }[], void>({
+      query: () => ({
+        url: "users",
+        method: "GET",
+      }),
+      transformResponse: (response: any) => response?.users ?? [],
+      providesTags: ["Users"],
     }),
 
     createTask: builder.mutation({
@@ -54,4 +69,4 @@ export const tasksApi = createApi({
   }),
 });
 
-export const { useGetAllTasksQuery, useCreateTaskMutation, useDeleteTaskMutation } = tasksApi;
+export const { useGetAllTasksQuery, useGetAllUsersQuery, useCreateTaskMutation, useDeleteTaskMutation } = tasksApi;

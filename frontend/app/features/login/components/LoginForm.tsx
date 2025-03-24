@@ -32,7 +32,7 @@ const LoginForm: React.FC = () => {
       localStorage.setItem("userRole", userRole);
       localStorage.setItem("token", response.token);
 
-      router.push(userRole === "ADMIN" ? "/kanban" : "/kanban");
+      router.push("/kanban");
     } catch (err: any) {
       if (err?.status === 404) {
         router.replace("/404");

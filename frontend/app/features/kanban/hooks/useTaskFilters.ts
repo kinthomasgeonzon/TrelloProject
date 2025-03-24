@@ -1,9 +1,15 @@
-import { useEffect, useState } from "react";
+import { useGetAllTasksQuery } from "@store/api/taskSlice";
+import { useGetAllUsersQuery } from "@store/api/userSlice";
 import { useForm } from "react-hook-form";
-import { TaskFilters } from "../utils/filterTasks";
+
+export interface TaskFilters {
+  status: string;
+  createdBy: string;
+  assignedTo: string;
+}
 
 export const useTaskFilters = () => {
-  const { register, watch } = useForm<TaskFilters>({
+  const { register, handleSubmit, reset, getValues } = useForm<TaskFilters>({
     defaultValues: {
       status: "ALL",
       createdBy: "ALL",
@@ -11,26 +17,24 @@ export const useTaskFilters = () => {
     },
   });
 
-  const [activeFilters, setActiveFilters] = useState<Partial<TaskFilters>>({});
+  const { data: usersData } = useGetAllUsersQuery();
+  const allUsers = Array.isArray(usersData) ? usersData : [];
 
-  useEffect(() => {
-    const subscription = watch((values) => {
-      setActiveFilters(
-        Object.fromEntries(Object.entries(values).filter(([_, value]) => value !== "ALL"))
-      );
-    });
+  const getFilteredQuery = () =>
+    Object.fromEntries(
+      Object.entries(getValues()).filter(([_, value]) => value !== "ALL" && value !== "")
+    );
 
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const filters = {
-    status: activeFilters.status ?? "ALL",
-    createdBy: activeFilters.createdBy ?? "ALL",
-    assignedTo: activeFilters.assignedTo ?? "ALL",
-  };
+  const { data: tasksData } = useGetAllTasksQuery(getFilteredQuery());
 
   return {
     register,
-    filters,
+    handleSubmit,
+    applyFilters: (data: TaskFilters) => {}, 
+    resetFilters: () => reset(),
+    uniqueCreators: allUsers,
+    uniqueAssignees: allUsers,
+    getFilteredQuery,
+    tasks: Array.isArray(tasksData) ? tasksData : [],
   };
 };

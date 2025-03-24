@@ -1,138 +1,81 @@
 "use client";
 
-import { useState } from "react";
+import Button from "@/app/components/button/Button";
+import { SubmitHandler, UseFormRegister } from "react-hook-form";
+import { TaskFilters } from "../hooks/useTaskFilters";
 
 interface TaskFilterProps {
-  uniqueCreators: string[];
-  uniqueAssignees: string[];
-  uniqueDueDates: string[];
-  uniqueCreatedAtDates: string[];
-  onFilterChange: (filters: {
-    status: string;
-    createdBy: string;
-    assignedTo: string;
-    dueDate: string;
-    createdAt: string;
-  }) => void;
+  register: UseFormRegister<TaskFilters>;
+  handleSubmit: (callback: SubmitHandler<TaskFilters>) => (event: React.FormEvent<HTMLFormElement>) => void;
+  applyFilters: SubmitHandler<TaskFilters>;
+  resetFilters: () => void;
+  uniqueCreators: { id: number; name: string }[];
+  uniqueAssignees: { id: number; name: string }[];
 }
 
-const TaskFilter: React.FC<TaskFilterProps> = ({
-  uniqueCreators,
-  uniqueAssignees,
-  uniqueDueDates,
-  uniqueCreatedAtDates,
-  onFilterChange,
-}) => {
-  const [status, setStatus] = useState<string>("ALL");
-  const [createdBy, setCreatedBy] = useState<string>("ALL");
-  const [assignedTo, setAssignedTo] = useState<string>("ALL");
-  const [dueDate, setDueDate] = useState<string>("ALL");
-  const [createdAt, setCreatedAt] = useState<string>("ALL");
-  const [createdAtOrder, setCreatedAtOrder] = useState<"NEWEST" | "OLDEST">("NEWEST");
-
-  const handleFilterChange = () => {
-    onFilterChange({ status, createdBy, assignedTo, dueDate, createdAt});
-  };
-
+const TaskFilter: React.FC<TaskFilterProps> = ({ register, handleSubmit, applyFilters, resetFilters, uniqueCreators, uniqueAssignees }) => {
   return (
-    <div className="field has-text-centered my-4">
-      <div className="columns is-multiline is-centered">
+    <form onSubmit={handleSubmit(applyFilters)}>
+      <div className="field has-text-centered my-4">
+        <div className="columns is-multiline is-centered">
+          <div className="column is-one-fifth">
+            <label className="label">Filter by Status:</label>
+            <div className="select is-primary">
+              <select {...register("status")}>
+                <option value="ALL">All</option>
+                <option value="TODO">TODO</option>
+                <option value="IN_PROGRESS">IN PROGRESS</option>
+                <option value="DONE">DONE</option>
+              </select>
+            </div>
+          </div>
 
-        <div className="column is-one-fifth">
-          <label className="label">Filter by Status:</label>
-          <div className="select is-primary">
-            <select
-              aria-label="Filter by Status"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              onBlur={handleFilterChange}
-            >
-              <option value="ALL">All</option>
-              <option value="TODO">TODO</option>
-              <option value="IN_PROGRESS">IN PROGRESS</option>
-              <option value="DONE">DONE</option>
-            </select>
+          <div className="column is-one-fifth">
+            <label className="label">Filter by Created By:</label>
+            <div className="select is-link">
+              <select {...register("createdBy")}>
+                <option value="ALL">All</option>
+                {uniqueCreators.length > 0 ? (
+                  uniqueCreators.map((creator) => (
+                    <option key={creator.id} value={String(creator.id)}>
+                      {creator.name}
+                    </option>
+                  ))
+                ) : (
+                  <option disabled>No creators found</option>
+                )}
+              </select>
+            </div>
+          </div>
+
+          <div className="column is-one-fifth">
+            <label className="label">Filter by Assigned To:</label>
+            <div className="select is-info">
+              <select {...register("assignedTo")}>
+                <option value="ALL">All</option>
+                {uniqueAssignees.length > 0 ? (
+                  uniqueAssignees.map((assignee) => (
+                    <option key={assignee.id} value={String(assignee.id)}>
+                      {assignee.name}
+                    </option>
+                  ))
+                ) : (
+                  <option disabled>No assignees found</option>
+                )}
+              </select>
+            </div>
           </div>
         </div>
 
-        <div className="column is-one-fifth">
-          <label className="label">Filter by Created By:</label>
-          <div className="select is-link">
-            <select
-              aria-label="Filter by Created By"
-              value={createdBy}
-              onChange={(e) => setCreatedBy(e.target.value)}
-              onBlur={handleFilterChange}
-            >
-              <option value="ALL">All</option>
-              {uniqueCreators.map((creator) => (
-                <option key={creator} value={creator}>
-                  {creator}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+        <Button type="submit" className="button is-primary is-medium mx-2">
+          Apply Filters
+        </Button>
 
-        <div className="column is-one-fifth">
-          <label className="label">Filter by Assigned To:</label>
-          <div className="select is-info">
-            <select
-              aria-label="Filter by Assigned To"
-              value={assignedTo}
-              onChange={(e) => setAssignedTo(e.target.value)}
-              onBlur={handleFilterChange}
-            >
-              <option value="ALL">All</option>
-              {uniqueAssignees.map((assignee) => (
-                <option key={assignee} value={assignee}>
-                  {assignee}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="column is-one-fifth">
-          <label className="label">Filter by Due Date:</label>
-          <div className="select is-danger">
-            <select
-              aria-label="Filter by Due Date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              onBlur={handleFilterChange}
-            >
-              <option value="ALL">All</option>
-              {uniqueDueDates.map((date) => (
-                <option key={date} value={date}>
-                  {date}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="column is-one-fifth">
-          <label className="label">Filter by Created At:</label>
-          <div className="select is-success">
-            <select
-              aria-label="Filter by Created At"
-              value={createdAt}
-              onChange={(e) => setCreatedAt(e.target.value)}
-              onBlur={handleFilterChange}
-            >
-              <option value="ALL">All</option>
-              {uniqueCreatedAtDates.map((date) => (
-                <option key={date} value={date}>
-                  {date}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
+        <Button type="button" className="button is-light is-medium mx-2" onClick={resetFilters}>
+          Reset Filters
+        </Button>
       </div>
-    </div>
+    </form>
   );
 };
 

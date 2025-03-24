@@ -15,13 +15,41 @@ const baseQuery = fetchBaseQuery({
 export const tasksApi = createApi({
   reducerPath: "tasksApi",
   baseQuery,
-  tagTypes: ["Tasks"],
+  tagTypes: ["Tasks", "Users"],
   endpoints: (builder) => ({
-    getAllTasks: builder.query<{ tasks: any[] }, void>({
-      query: () => "tasks",
-      transformResponse: (response: { tasks: any[] }) => ({ tasks: response.tasks || [] }),
+    getAllTasks: builder.query<
+      any[],
+      Partial<{ status: string; createdBy: string; assignedTo: string }>
+    >({
+      query: (filters) => {
+        const filteredParams = Object.fromEntries(
+          Object.entries(filters || {}).filter(([_, value]) => value && value !== "ALL")
+        );
+
+        return {
+          url: "tasks",
+          method: "GET",
+          params: filteredParams,
+        };
+      },
+      transformResponse: (response: any) =>
+        response?.tasks.map((task: any) => ({
+          ...task,
+          createdBy: task.createdBy || null,
+          assignedTo: task.assignedTo || null,
+        })) ?? [],
       providesTags: ["Tasks"],
     }),
+
+    getAllUsers: builder.query<{ id: number; name: string }[], void>({
+      query: () => ({
+        url: "users",
+        method: "GET",
+      }),
+      transformResponse: (response: any) => response?.users ?? [],
+      providesTags: ["Users"],
+    }),
+
     createTask: builder.mutation({
       query: (taskData) => ({
         url: "tasks",
@@ -41,4 +69,4 @@ export const tasksApi = createApi({
   }),
 });
 
-export const { useGetAllTasksQuery, useCreateTaskMutation, useEditTaskMutation } = tasksApi;
+export const { useGetAllTasksQuery, useGetAllUsersQuery, useCreateTaskMutation, useEditTaskMutation } = tasksApi;

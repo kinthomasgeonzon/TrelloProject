@@ -2,74 +2,62 @@
 
 import { useGetAllTasksQuery } from "@store/api/taskSlice";
 import { useState } from "react";
+import { useTaskFilters } from "../hooks/useTaskFilters";
 import styles from "../styles/kanban.module.css";
-import { filterTasks, TaskFilters } from "../utils/filterTasks";
-import CreateTaskForm from "./CreateTaskForm";
-import TaskCard from "./TaskCard";
 import TaskFilter from "./TaskFilter";
 
 const KanbanBoard: React.FC = () => {
-  const { data, error, isLoading } = useGetAllTasksQuery();
-  const tasks = data?.tasks || [];
+  const { register, handleSubmit, resetFilters, applyFilters, getFilteredQuery, uniqueCreators, uniqueAssignees } =
+    useTaskFilters();
 
-  const [filters, setFilters] = useState<TaskFilters>({
-    status: "ALL",
-    createdBy: "ALL",
-    assignedTo: "ALL",
-    dueDate: "ALL",
-    createdAt: "ALL",
-    createdAtOrder: "NEWEST",
-  });
+  const [filters, setFilters] = useState(getFilteredQuery());
+  const { data: tasksData, error, isLoading } = useGetAllTasksQuery(filters);
+  const tasks = Array.isArray(tasksData) ? tasksData : [];
 
-  if (isLoading)
-    return <p className="notification is-info">Loading tasks...</p>;
-  if (error) {
-    console.error("Error loading tasks:", error);
-    return <p className="notification is-danger">Error loading tasks.</p>;
-  }
-
-  const uniqueCreators = [...new Set(tasks.map((task) => task.createdBy))];
-  const uniqueAssignees = [...new Set(tasks.map((task) => task.assignedTo))];
-  const uniqueDueDates = [...new Set(tasks.map((task) => task.dueDate))];
-  const uniqueCreatedAtDates = [...new Set(tasks.map((task) => task.createdAt))];
-
-  const filteredTasks = filterTasks(tasks, filters);
+  if (isLoading) return <p className="notification is-info">Loading tasks...</p>;
+  if (error) return <p className="notification is-danger">Error loading tasks.</p>;
 
   return (
     <div className={styles.kanbanContainer}>
-      <div className={styles.sidebar}>
-        <CreateTaskForm />
-      </div>
-
       <TaskFilter
+        register={register}
+        handleSubmit={handleSubmit}
+        applyFilters={(data) => setFilters(data)}
+        resetFilters={() => {
+          resetFilters();
+          setFilters(getFilteredQuery());
+        }}
         uniqueCreators={uniqueCreators}
         uniqueAssignees={uniqueAssignees}
-        uniqueDueDates={uniqueDueDates}
-        uniqueCreatedAtDates={uniqueCreatedAtDates}
-        onFilterChange={(newFilters) =>
-          setFilters((prev) => ({ ...prev, ...newFilters }))
-        }
       />
 
       <div className={`${styles.kanbanBoard} columns is-variable is-4`}>
-        {["TODO", "IN_PROGRESS", "DONE"]
-          .filter(
-            (status) => filters.status === "ALL" || filters.status === status
-          )
-          .map((status) => (
-            <div key={status} className="column is-one-third">
-              <h3 className="title is-4 has-text-centered">
-                {status.replace("_", " ")}
-              </h3>
-              <div className="box has-background-light p-3">
-                {filteredTasks
+        {["TODO", "IN_PROGRESS", "DONE"].map((status) => (
+          <div key={status} className="column is-one-third">
+            <h3 className="title is-4 has-text-centered">{status.replace("_", " ")}</h3>
+            <div className="box has-background-light p-3">
+              {tasks.filter((task) => task.status === status).length === 0 ? (
+                <p className="has-text-centered has-text-grey-light">No tasks available.</p>
+              ) : (
+                tasks
                   .filter((task) => task.status === status)
                   .map((task) => (
-                    <TaskCard key={task.id} task={task} />
-                  ))}
-              </div>
+                    <div key={task.id} className="card mb-3">
+                      <header className="card-header">
+                        <p className="card-header-title">{task.title}</p>
+                      </header>
+                      <div className="card-content">
+                        <p>{task.description}</p>
+                        <p className="has-text-grey">
+                          Created By: {task.createdBy} | Assigned To: {task.assignedTo}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+              )}
             </div>
-          ))}
+          </div>
+        ))}
       </div>
     </div>
   );

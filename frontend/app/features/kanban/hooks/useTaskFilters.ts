@@ -19,7 +19,6 @@ export const useTaskFilters = () => {
 
   const { data: usersData } = useGetAllUsersQuery();
   const allUsers = Array.isArray(usersData) ? usersData : [];
-
   const [filters, setFilters] = useState<Record<string, string>>({});
 
   return {

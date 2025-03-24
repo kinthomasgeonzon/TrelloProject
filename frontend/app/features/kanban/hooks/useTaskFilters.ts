@@ -30,14 +30,14 @@ export const useTaskFilters = () => {
       const newFilters = Object.fromEntries(
         Object.entries(getValues()).filter(([_, value]) => value !== "ALL" && value !== "")
       );
-      setFilters(newFilters); // Only update filters when button is pressed
+      setFilters(newFilters);
     },
     resetFilters: () => {
       reset();
-      setFilters({}); // Reset to empty filters when reset is pressed
+      setFilters({});
     },
     uniqueCreators: allUsers,
     uniqueAssignees: allUsers,
-    filters, // This will update only when "Apply Filters" is pressed
+    filters,
   };
 };

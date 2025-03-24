@@ -2,7 +2,7 @@
 
 import Modal from "../../../components/modal/Modal";
 import { useEditTaskForm } from "../hooks/useEditTaskForm";
-import { Task } from "../utils/filterTasks";
+import { Task } from "../utils/Tasks";
 
 interface EditTaskFormProps {
   task: Task;

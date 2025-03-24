@@ -1,19 +1,11 @@
 import { useState } from "react";
 import Modal from "../../../components/modal/Modal";
+import { Task } from "../utils/Tasks";
 import EditTaskForm from "./EditTaskForm";
 
 interface TaskCardProps {
-  task: {
-    id: string;
-    title: string;
-    description: string;
-    dueDate: string;
-    createdBy: string;
-    assignedTo: string;
-    status: string;
-    createdAt: string;
-    taskOrder: any;
-  };
+  task: Task;
+  onEdit: () => void;
 }
 
 const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
@@ -27,7 +19,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
       <div className="card-content">
         <p>{task.description}</p>
         <p className="has-text-grey-light">
-          Due Date: {new Date(task.dueDate).toLocaleDateString()}
+          Due Date: {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : "No due date"}
         </p>
         <p className="has-text-grey">
           Created By: {task.createdBy} | Assigned To: {task.assignedTo}

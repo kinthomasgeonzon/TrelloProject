@@ -1,6 +1,5 @@
 import { useGetAllTasksQuery } from "@store/api/taskSlice";
 import { useGetAllUsersQuery } from "@store/api/userSlice";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 export interface TaskFilters {
@@ -18,42 +17,24 @@ export const useTaskFilters = () => {
     },
   });
 
-  const [filters, setFilters] = useState<TaskFilters>({
-    status: "ALL",
-    createdBy: "ALL",
-    assignedTo: "ALL",
-  });
-
   const { data: usersData } = useGetAllUsersQuery();
   const allUsers = Array.isArray(usersData) ? usersData : [];
 
-  const applyFilters = (data: TaskFilters) => {
-    setFilters(data);
-  };
+  const getFilteredQuery = () =>
+    Object.fromEntries(
+      Object.entries(getValues()).filter(([_, value]) => value !== "ALL" && value !== "")
+    );
 
-  const filteredQuery = Object.fromEntries(
-    Object.entries(filters).filter(([_, value]) => value !== "ALL" && value !== "")
-  );
-
-  const { data: tasksData } = useGetAllTasksQuery(filteredQuery);
-  const tasks = Array.isArray(tasksData) ? tasksData : [];
+  const { data: tasksData } = useGetAllTasksQuery(getFilteredQuery());
 
   return {
     register,
     handleSubmit,
-    applyFilters,
-    filters,
-    resetFilters: () => {
-      reset();
-      setFilters({
-        status: "ALL",
-        createdBy: "ALL",
-        assignedTo: "ALL",
-      });
-    },
+    applyFilters: (data: TaskFilters) => {}, 
+    resetFilters: () => reset(),
     uniqueCreators: allUsers,
     uniqueAssignees: allUsers,
-    tasks,
+    getFilteredQuery,
+    tasks: Array.isArray(tasksData) ? tasksData : [],
   };
 };
-

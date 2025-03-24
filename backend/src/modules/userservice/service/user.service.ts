@@ -6,7 +6,7 @@ export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getAllUsers() {
-    return this.prisma.user.findMany({
+    return await this.prisma.user.findMany({
       select: { id: true, name: true },
     });
   }

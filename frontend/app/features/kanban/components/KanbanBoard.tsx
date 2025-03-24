@@ -12,8 +12,9 @@ import Sidebar from "./Sidebar";
 import TaskFilter from "./TaskFilter";
 
 const KanbanBoard: React.FC = () => {
-  const { register, filters } = useTaskFilters();
+  const { register, handleSubmit, resetFilters, applyFilters, uniqueCreators, uniqueAssignees, filters } = useTaskFilters();
   const { data: tasks = [] } = useGetAllTasksQuery(filters);
+
   const { onDragEnd } = useTaskDragAndDrop();
   const { userRole } = useAuth();
 
@@ -22,7 +23,14 @@ const KanbanBoard: React.FC = () => {
       <div className={styles.kanbanContainer}>
         <LogoutButton />
         <Sidebar userRole={userRole} />
-        <TaskFilter register={register} tasks={tasks} />
+        <TaskFilter
+          register={register}
+          handleSubmit={handleSubmit}
+          applyFilters={applyFilters}
+          resetFilters={resetFilters}
+          uniqueCreators={uniqueCreators}
+          uniqueAssignees={uniqueAssignees}
+        />
         <div className={`${styles.kanbanBoard} columns is-variable is-4`}>
           {["TODO", "IN_PROGRESS", "DONE"].map((status) => (
             <DroppableColumn key={status} status={status} tasks={tasks} />

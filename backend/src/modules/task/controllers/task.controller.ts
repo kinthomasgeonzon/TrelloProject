@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Delete,
-  ForbiddenException,
   Get,
   Param,
   ParseIntPipe,
@@ -10,13 +9,15 @@ import {
   Post,
   Query,
   Req,
-  UseGuards
+  UseGuards,
+  UsePipes,
+  ValidationPipe
 } from '@nestjs/common';
-import { Status } from '@prisma/client';
 import { Request } from 'express';
 import { TaskAuthGuard } from '../../guards/task-auth.guard';
 import { CreateTaskDto } from '../dto/req.create-task.dto';
 import { EditTaskDto } from '../dto/req.edittasks.dto';
+import { TaskFilterDto } from '../dto/req.task-filter.dto';
 import { UpdateTaskDto } from '../dto/req.updatetask.dto';
 import { TaskService } from '../services/task.service';
 
@@ -39,45 +40,13 @@ export class TaskController {
 
   @Post()
   async create(@Req() req: AuthenticatedRequest, @Body() dto: CreateTaskDto) {
-    const user = req.user;
-    return await this.taskService.createTask({ ...dto, createdBy: user.id });
+    return await this.taskService.createTask({ ...dto, createdBy: req.user.id });
   }
 
   @Get()
-  async getAllTasks(
-    @Req() req: AuthenticatedRequest,
-    @Query('status') status?: string,
-    @Query('createdBy') createdBy?: string,
-    @Query('assignedTo') assignedTo?: string,
-  ) {
-    const user = req.user;
-
-    if (user.role !== 'ADMIN' && user.role !== 'MEMBER') {
-      throw new ForbiddenException('Access denied: Insufficient permissions.');
-    }
-
-    const where: any = { deletedAt: null };
-
-    if (status && status !== 'ALL' && Object.values(Status).includes(status as Status)) {
-      where.status = status as Status;
-    }
-
-    if (createdBy) {
-      const createdByInt = parseInt(createdBy, 10);
-      if (!isNaN(createdByInt)) where.createdBy = createdByInt;
-    }
-
-    if (assignedTo) {
-      const assignedToInt = parseInt(assignedTo, 10);
-      if (!isNaN(assignedToInt)) where.assignedTo = assignedToInt;
-    }
-
-    const tasks = await this.taskService.getAllTasks(where);
-
-    return {
-      message: 'All tasks retrieved successfully',
-      tasks,
-    };
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async getAllTasks(@Query() filterDto: TaskFilterDto) {
+    return await this.taskService.getAllTasks(filterDto);
   }
 
   @Delete(':id')

@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Status } from '@prisma/client';
-import { PrismaService } from '../../../prisma.service';
-import { CreateTaskDto } from '../dto/req.create-task.dto';
-import { EditTaskDto } from '../dto/req.edittasks.dto';
-import { ResCreateTaskDto } from '../dto/res.create-task.dto';
-import { ResEditTaskDto } from '../dto/res.edittask.dto';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { Status } from "@prisma/client";
+import { PrismaService } from "../../../prisma.service";
+import { CreateTaskDto } from "../dto/req.create-task.dto";
+import { EditTaskDto } from "../dto/req.edittasks.dto";
+import { TaskFilterDto } from "../dto/req.task-filter.dto";
+import { ResCreateTaskDto } from "../dto/res.create-task.dto";
+import { ResEditTaskDto } from "../dto/res.edittask.dto";
 
 @Injectable()
 export class TaskService {
@@ -29,10 +30,14 @@ export class TaskService {
         assignedTo: dto.assignedTo ?? task.assignedTo,
         updatedAt: new Date(),
       },
+      include: {
+        creator: { select: { id: true, name: true } },
+        assignee: { select: { id: true, name: true } },
+      },
     });
 
     return {
-      message: 'Task updated successfully',
+      message: "Task updated successfully",
       task: updatedTask,
     };
   }
@@ -57,19 +62,57 @@ export class TaskService {
         updatedAt: new Date(),
         deletedAt: null,
       },
+      include: {
+        creator: { select: { id: true, name: true } },
+        assignee: { select: { id: true, name: true } },
+      },
     });
 
     return {
-      message: 'Task created successfully',
+      message: "Task created successfully",
       task,
     };
   }
 
-  async getAllTasks(where: any) {
-    return await this.prisma.task.findMany({
-      where: { ...where, deletedAt: null },
-      orderBy: { taskOrder: 'asc' },
+  async getAllTasks(filterDto: TaskFilterDto) {
+    const where = this.buildTaskFilter(filterDto);
+
+    const tasks = await this.prisma.task.findMany({
+      where,
+      orderBy: { taskOrder: "asc" },
+      include: {
+        creator: { select: { id: true, name: true } },
+        assignee: { select: { id: true, name: true } },
+      },
     });
+
+    return {
+      message: "Tasks retrieved successfully",
+      tasks: tasks.map((task) => ({
+        ...task,
+        createdBy: task.creator ? task.creator.name : "Unknown",
+        assignedTo: task.assignee ? task.assignee.name : "Unassigned",
+      })),
+    };
+  }
+
+  private buildTaskFilter(filterDto: TaskFilterDto) {
+    const { status, createdBy, assignedTo } = filterDto;
+    const where: any = { deletedAt: null };
+
+    if (status && Object.values(Status).includes(status)) {
+      where.status = status;
+    }
+
+    if (createdBy) {
+      where.createdBy = createdBy;
+    }
+
+    if (assignedTo) {
+      where.assignedTo = assignedTo;
+    }
+
+    return where;
   }
 
   async deleteTask(id: number) {
@@ -86,14 +129,14 @@ export class TaskService {
       data: { deletedAt: new Date(), updatedAt: new Date() },
     });
 
-    return { message: 'Task soft deleted successfully' };
+    return { message: "Task soft deleted successfully" };
   }
 
   async updateTaskStatus(id: number, newStatus: Status): Promise<ResEditTaskDto> {
     const task = await this.prisma.task.findUnique({ where: { id } });
 
     if (!task) {
-      throw new NotFoundException(`Task with ID ${id} not found`);
+      throw new NotFoundException(`Task with ID ${id} not found or already deleted`);
     }
 
     const updatedTask = await this.prisma.task.update({
@@ -105,7 +148,7 @@ export class TaskService {
     });
 
     return {
-      message: 'Task status updated successfully',
+      message: "Task status updated successfully",
       task: updatedTask,
     };
   }
@@ -114,20 +157,20 @@ export class TaskService {
     const task = await this.prisma.task.findUnique({
       where: { id, deletedAt: null },
     });
-  
+
     if (!task) {
       throw new NotFoundException(`Task with ID ${id} not found or deleted`);
     }
-  
+
     const updatedTask = await this.prisma.task.update({
       where: { id },
       data: { taskOrder, updatedAt: new Date() },
     });
-  
+
     return {
-      message: 'Task order updated successfully',
+      message: "Task order updated successfully",
       task: updatedTask,
     };
+
   }
-  
 }

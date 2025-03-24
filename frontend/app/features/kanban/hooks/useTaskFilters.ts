@@ -1,9 +1,15 @@
-import { useEffect, useState } from "react";
-import { useForm, UseFormRegister } from "react-hook-form";
-import { TaskFilters } from "../utils/filterTasks";
+import { useGetAllUsersQuery } from "@store/api/userSlice";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+
+export interface TaskFilters {
+  status: string;
+  createdBy: string;
+  assignedTo: string;
+}
 
 export const useTaskFilters = () => {
-  const { register, watch } = useForm<TaskFilters>({
+  const { register, handleSubmit, reset, getValues } = useForm<TaskFilters>({
     defaultValues: {
       status: "ALL",
       createdBy: "ALL",
@@ -11,26 +17,27 @@ export const useTaskFilters = () => {
     },
   });
 
-  const [activeFilters, setActiveFilters] = useState<Partial<TaskFilters>>({});
+  const { data: usersData } = useGetAllUsersQuery();
+  const allUsers = Array.isArray(usersData) ? usersData : [];
 
-  const filters: TaskFilters = {
-    status: activeFilters.status ?? "ALL",
-    createdBy: activeFilters.createdBy ?? "ALL",
-    assignedTo: activeFilters.assignedTo ?? "ALL",
-  };
-
-  useEffect(() => {
-    const subscription = watch((values) => {
-      setActiveFilters(
-        Object.fromEntries(Object.entries(values).filter(([_, value]) => value !== "ALL"))
-      );
-    });
-
-    return () => subscription.unsubscribe();
-  }, [watch]);
+  // State to store applied filters
+  const [filters, setFilters] = useState<Record<string, string>>({});
 
   return {
-    register: register as UseFormRegister<TaskFilters>,
-    filters,
+    register,
+    handleSubmit,
+    applyFilters: () => {
+      const newFilters = Object.fromEntries(
+        Object.entries(getValues()).filter(([_, value]) => value !== "ALL" && value !== "")
+      );
+      setFilters(newFilters); // Only update filters when button is pressed
+    },
+    resetFilters: () => {
+      reset();
+      setFilters({}); // Reset to empty filters when reset is pressed
+    },
+    uniqueCreators: allUsers,
+    uniqueAssignees: allUsers,
+    filters, // This will update only when "Apply Filters" is pressed
   };
 };

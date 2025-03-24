@@ -25,7 +25,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     if (user.role !== 'ADMIN') {
       throw new UnauthorizedException('Invalid role assigned to user.');
     }
-    
+
     return user;
   }
 }

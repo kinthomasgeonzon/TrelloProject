@@ -7,6 +7,6 @@ export class UserController {
 
   @Get()
   async getAllUsers() {
-    return this.userService.getAllUsers();
+    return await this.userService.getAllUsers();
   }
 }

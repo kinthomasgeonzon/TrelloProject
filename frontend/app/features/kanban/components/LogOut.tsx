@@ -9,27 +9,22 @@ const LogoutButton: React.FC = () => {
   const router = useRouter();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("userId");
-
+    localStorage.clear();
     window.dispatchEvent(new Event("storage"));
-    window.history.replaceState(null, "", "/login");
-
-    router.push("/login");
+    router.replace("/login");
   };
 
   useEffect(() => {
     const preventBackNavigation = () => {
-      router.replace("/login");
+      window.history.pushState(null, "", window.location.href);
     };
 
-    window.history.pushState(null, "", "/login");
-    window.history.replaceState(null, "", "/login");
-
     window.addEventListener("popstate", preventBackNavigation);
-    return () => window.removeEventListener("popstate", preventBackNavigation);
-  }, [router]);
+
+    return () => {
+      window.removeEventListener("popstate", preventBackNavigation);
+    };
+  }, []);
 
   return (
     <div className={styles.logoutButton}>

@@ -9,7 +9,7 @@ import { ResEditTaskDto } from "../dto/res.edittask.dto";
 
 @Injectable()
 export class TaskService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async editTask(id: number, dto: EditTaskDto): Promise<ResEditTaskDto> {
     const task = await this.prisma.task.findUnique({
@@ -50,7 +50,7 @@ export class TaskService {
         description: dto.description ?? null,
         dueDate: dto.dueDate ?? null,
         status: Status.TODO,
-        assignedTo: dto.assignedTo ?? null,
+        assignedTo: dto.assignedTo ?? undefined,
         taskOrder: dto.taskOrder ?? 0,
         createdBy: dto.createdBy,
         updatedAt: new Date(),
@@ -81,15 +81,14 @@ export class TaskService {
     });
   
     return {
-      message: "Filtered tasks retrieved successfully",
+      message: "Tasks retrieved successfully",
       tasks: tasks.map((task) => ({
         ...task,
-        createdBy: task.creator,
-        assignedTo: task.assignee,
+        createdBy: task.creator ? task.creator.name : "Unknown",
+        assignedTo: task.assignee ? task.assignee.name : "Unassigned",
       })),
     };
   }
-  
 
   private buildTaskFilter(filterDto: TaskFilterDto) {
     const { status, createdBy, assignedTo } = filterDto;

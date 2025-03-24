@@ -3,11 +3,10 @@
 import { useGetAllTasksQuery } from "@store/api/taskSlice";
 import { useTaskFilters } from "../hooks/useTaskFilters";
 import styles from "../styles/kanban.module.css";
-import CreateTaskForm from "./CreateTaskForm";
 import TaskFilter from "./TaskFilter";
 
 const KanbanBoard: React.FC = () => {
-  const { register, setValue, filters, resetFilters, uniqueCreators, uniqueAssignees } = useTaskFilters();
+  const { register, handleSubmit, resetFilters, applyFilters, filters, uniqueCreators, uniqueAssignees } = useTaskFilters();
   const { data: tasksData, error, isLoading } = useGetAllTasksQuery(filters);
 
   const tasks = Array.isArray(tasksData) ? tasksData : [];
@@ -17,17 +16,15 @@ const KanbanBoard: React.FC = () => {
 
   return (
     <div className={styles.kanbanContainer}>
-      <div className={styles.sidebar}>
-        <CreateTaskForm />
-      </div>
-
       <TaskFilter
         register={register}
-        setValue={setValue}
+        handleSubmit={handleSubmit}
+        applyFilters={(data) => handleSubmit(() => applyFilters(data))()}
         resetFilters={resetFilters}
         uniqueCreators={uniqueCreators}
         uniqueAssignees={uniqueAssignees}
       />
+
 
       <div className={`${styles.kanbanBoard} columns is-variable is-4`}>
         {["TODO", "IN_PROGRESS", "DONE"].map((status) => (
@@ -44,8 +41,7 @@ const KanbanBoard: React.FC = () => {
                     <div className="card-content">
                       <p>{task.description}</p>
                       <p className="has-text-grey">
-                        Created By: {task.createdBy?.name || "Unknown"} | 
-                        Assigned To: {task.assignedTo?.name || "Unassigned"}
+                        Created By: {task.createdBy} | Assigned To: {task.assignedTo}
                       </p>
                     </div>
                   </div>

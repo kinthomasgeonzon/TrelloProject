@@ -3,12 +3,13 @@ import { Status } from '@prisma/client';
 import { PrismaService } from '../../../prisma.service';
 import { CreateTaskDto } from '../dto/req.create-task.dto';
 import { EditTaskDto } from '../dto/req.edittasks.dto';
+import { TaskFilterDto } from '../dto/req.task-filter.dto';
 import { ResCreateTaskDto } from '../dto/res.create-task.dto';
 import { ResEditTaskDto } from '../dto/res.edittask.dto';
 
 @Injectable()
 export class TaskService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async editTask(id: number, dto: EditTaskDto): Promise<ResEditTaskDto> {
     const task = await this.prisma.task.findUnique({
@@ -16,9 +17,7 @@ export class TaskService {
     });
 
     if (!task) {
-      throw new NotFoundException(
-        `Task with ID ${id} not found or has been deleted`,
-      );
+      throw new NotFoundException(`Task with ID ${id} not found or deleted`);
     }
 
     const updatedTask = await this.prisma.task.update({
@@ -28,7 +27,7 @@ export class TaskService {
         description: dto.description ?? task.description,
         dueDate: dto.dueDate ?? task.dueDate,
         status: dto.status ?? task.status,
-        assignedTo: dto.assignedTo ?? task.assignedTo,
+        assignedTo: dto.assignedTo ? Number(dto.assignedTo) : task.assignedTo,
         taskOrder: dto.taskOrder ?? task.taskOrder,
         updatedAt: new Date(),
       },
@@ -47,11 +46,11 @@ export class TaskService {
         description: dto.description ?? null,
         dueDate: dto.dueDate ?? null,
         status: Status.TODO,
-        assignedTo: dto.assignedTo ?? null,
+        assignedTo: dto.assignedTo ? Number(dto.assignedTo) : null,
         taskOrder: dto.taskOrder ?? 0,
-        createdBy: dto.createdBy,
+        createdBy: Number(dto.createdBy),
         updatedAt: new Date(),
-        deletedAt: null,
+        deletedAt: null
       },
     });
 
@@ -61,11 +60,35 @@ export class TaskService {
     };
   }
 
-  async getAllTasks(where: any) {
-    return await this.prisma.task.findMany({
-      where: { ...where, deletedAt: null }, 
-      orderBy: { createdAt: 'desc' }, 
+  async getAllTasks(filterDto: TaskFilterDto) {
+    const where = this.buildTaskFilter(filterDto);
+  
+    const tasks = await this.prisma.task.findMany({
+      where,
+      orderBy: { taskOrder: "asc" },
     });
+  
+    return { message: "Filtered tasks retrieved successfully", tasks };
+  }
+  
+
+  private buildTaskFilter(filterDto: TaskFilterDto) {
+    const { status, createdBy, assignedTo } = filterDto;
+    const where: any = { deletedAt: null };
+
+    if (status && status !== 'ALL' && Object.values(Status).includes(status as Status)) {
+      where.status = status as Status;
+    }
+
+    if (createdBy && createdBy !== 'ALL' && !isNaN(Number(createdBy))) {
+      where.createdBy = Number(createdBy);
+    }
+
+    if (assignedTo && assignedTo !== 'ALL' && !isNaN(Number(assignedTo))) {
+      where.assignedTo = Number(assignedTo);
+    }
+
+    return where;
   }
 
   async deleteTask(id: number) {
@@ -82,6 +105,7 @@ export class TaskService {
       data: { deletedAt: new Date(), updatedAt: new Date() },
     });
 
-    return { message: 'Task soft deleted successfully' };
+    return { message: "Task soft deleted successfully" };
   }
+
 }

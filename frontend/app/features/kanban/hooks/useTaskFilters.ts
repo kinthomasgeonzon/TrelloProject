@@ -1,9 +1,15 @@
+import { useGetAllTasksQuery } from "@store/api/taskSlice";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { TaskFilters } from "../utils/filterTasks";
+
+export interface TaskFilters {
+  status: string;
+  createdBy: string;
+  assignedTo: string;
+}
 
 export const useTaskFilters = () => {
-  const { register, watch } = useForm<TaskFilters>({
+  const { register, watch, setValue } = useForm<TaskFilters>({
     defaultValues: {
       status: "ALL",
       createdBy: "ALL",
@@ -11,26 +17,42 @@ export const useTaskFilters = () => {
     },
   });
 
-  const [activeFilters, setActiveFilters] = useState<Partial<TaskFilters>>({});
+  const [activeFilters, setActiveFilters] = useState<TaskFilters>({
+    status: "ALL",
+    createdBy: "ALL",
+    assignedTo: "ALL",
+  });
 
   useEffect(() => {
     const subscription = watch((values) => {
-      setActiveFilters(
-        Object.fromEntries(Object.entries(values).filter(([_, value]) => value !== "ALL"))
-      );
+      setActiveFilters({
+        status: values.status || "ALL",
+        createdBy: values.createdBy || "ALL",
+        assignedTo: values.assignedTo || "ALL",
+      });
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [watch]);
 
-  const filters = {
-    status: activeFilters.status ?? "ALL",
-    createdBy: activeFilters.createdBy ?? "ALL",
-    assignedTo: activeFilters.assignedTo ?? "ALL",
-  };
+  const { data: tasksData } = useGetAllTasksQuery({});
+  const tasks = Array.isArray(tasksData) ? tasksData : [];
 
   return {
     register,
-    filters,
+    filters: activeFilters,
+    setValue,
+    resetFilters: () => {
+      setValue("status", "ALL");
+      setValue("createdBy", "ALL");
+      setValue("assignedTo", "ALL");
+      setActiveFilters({
+        status: "ALL",
+        createdBy: "ALL",
+        assignedTo: "ALL",
+      });
+    },
+    uniqueCreators: [...new Set(tasks.map((task) => task.createdBy))],
+    uniqueAssignees: [...new Set(tasks.map((task) => task.assignedTo))],
   };
 };

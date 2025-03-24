@@ -7,7 +7,7 @@ import CreateTaskForm from "./CreateTaskForm";
 import TaskFilter from "./TaskFilter";
 
 const KanbanBoard: React.FC = () => {
-  const { register, filters, setValue, uniqueCreators, uniqueAssignees } = useTaskFilters();
+  const { register, setValue, filters, resetFilters, uniqueCreators, uniqueAssignees } = useTaskFilters();
   const { data: tasksData, error, isLoading } = useGetAllTasksQuery(filters);
 
   const tasks = Array.isArray(tasksData) ? tasksData : [];
@@ -21,7 +21,13 @@ const KanbanBoard: React.FC = () => {
         <CreateTaskForm />
       </div>
 
-      <TaskFilter register={register} setValue={setValue} uniqueCreators={uniqueCreators} uniqueAssignees={uniqueAssignees} />
+      <TaskFilter
+        register={register}
+        setValue={setValue}
+        resetFilters={resetFilters}
+        uniqueCreators={uniqueCreators}
+        uniqueAssignees={uniqueAssignees}
+      />
 
       <div className={`${styles.kanbanBoard} columns is-variable is-4`}>
         {["TODO", "IN_PROGRESS", "DONE"].map((status) => (
@@ -38,7 +44,8 @@ const KanbanBoard: React.FC = () => {
                     <div className="card-content">
                       <p>{task.description}</p>
                       <p className="has-text-grey">
-                        Created By: {task.createdBy} | Assigned To: {task.assignedTo}
+                        Created By: {task.createdBy?.name || "Unknown"} | 
+                        Assigned To: {task.assignedTo?.name || "Unassigned"}
                       </p>
                     </div>
                   </div>

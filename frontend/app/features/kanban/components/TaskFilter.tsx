@@ -6,8 +6,9 @@ import { TaskFilters } from "../hooks/useTaskFilters";
 interface TaskFilterProps {
   register: UseFormRegister<TaskFilters>;
   setValue: UseFormSetValue<TaskFilters>;
-  uniqueCreators: string[];
-  uniqueAssignees: string[];
+  resetFilters: () => void;
+  uniqueCreators: { id: number; name: string }[];
+  uniqueAssignees: { id: number; name: string }[];
 }
 
 const TaskFilter: React.FC<TaskFilterProps> = ({ register, setValue, uniqueCreators, uniqueAssignees }) => {
@@ -18,6 +19,7 @@ const TaskFilter: React.FC<TaskFilterProps> = ({ register, setValue, uniqueCreat
   return (
     <div className="field has-text-centered my-4">
       <div className="columns is-multiline is-centered">
+        {/* Status Filter */}
         <div className="column is-one-fifth">
           <label className="label">Filter by Status:</label>
           <div className="select is-primary">
@@ -35,9 +37,15 @@ const TaskFilter: React.FC<TaskFilterProps> = ({ register, setValue, uniqueCreat
           <div className="select is-link">
             <select {...register("createdBy")} onChange={(e) => handleFilterChange("createdBy", e.target.value)}>
               <option value="ALL">All</option>
-              {uniqueCreators.length > 0 ? uniqueCreators.map((creator) => (
-                <option key={creator} value={creator}>{creator}</option>
-              )) : <option disabled>No creators found</option>}
+              {uniqueCreators.length > 0 ? (
+                uniqueCreators.map((creator) => (
+                  <option key={creator.id} value={String(creator.id)}>
+                    {creator.name}
+                  </option>
+                ))
+              ) : (
+                <option disabled>No creators found</option>
+              )}
             </select>
           </div>
         </div>
@@ -47,9 +55,15 @@ const TaskFilter: React.FC<TaskFilterProps> = ({ register, setValue, uniqueCreat
           <div className="select is-info">
             <select {...register("assignedTo")} onChange={(e) => handleFilterChange("assignedTo", e.target.value)}>
               <option value="ALL">All</option>
-              {uniqueAssignees.length > 0 ? uniqueAssignees.map((assignee) => (
-                <option key={assignee} value={assignee}>{assignee}</option>
-              )) : <option disabled>No assignees found</option>}
+              {uniqueAssignees.length > 0 ? (
+                uniqueAssignees.map((assignee) => (
+                  <option key={assignee.id} value={String(assignee.id)}>
+                    {assignee.name}
+                  </option>
+                ))
+              ) : (
+                <option disabled>No assignees found</option>
+              )}
             </select>
           </div>
         </div>

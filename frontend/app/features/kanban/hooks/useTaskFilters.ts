@@ -7,32 +7,43 @@ export interface TaskFilters {
   assignedTo: string;
 }
 
-const DEFAULT_FILTERS: TaskFilters = {
-  status: "ALL",
-  createdBy: "ALL",
-  assignedTo: "ALL",
-};
-
 export const useTaskFilters = () => {
-  const { register, watch, setValue } = useForm<TaskFilters>({
-    defaultValues: DEFAULT_FILTERS,
+  const { register, setValue, watch, reset } = useForm<TaskFilters>({
+    defaultValues: {
+      status: "ALL",
+      createdBy: "ALL",
+      assignedTo: "ALL",
+    },
   });
 
-  const filters = watch();
+  const { data: tasks } = useGetAllTasksQuery({}, {
+    selectFromResult: ({ data }) => ({
+      data: Array.isArray(data) ? data : [],
+    }),
+  });
 
-  const { data: tasksData } = useGetAllTasksQuery({});
-  const tasks = Array.isArray(tasksData) ? tasksData : [];
+  const uniqueCreators = [
+    ...new Map(
+      (tasks ?? [])
+        .filter((task) => task.createdBy)
+        .map((task) => [task.createdBy.id, { id: task.createdBy.id, name: task.createdBy.name }])
+    ).values(),
+  ];
+
+  const uniqueAssignees = [
+    ...new Map(
+      (tasks ?? [])
+        .filter((task) => task.assignedTo)
+        .map((task) => [task.assignedTo.id, { id: task.assignedTo.id, name: task.assignedTo.name }])
+    ).values(),
+  ];
 
   return {
     register,
-    filters,
     setValue,
-    resetFilters: () => {
-      Object.entries(DEFAULT_FILTERS).forEach(([key, value]) =>
-        setValue(key as keyof TaskFilters, value)
-      );
-    },
-    uniqueCreators: [...new Set(tasks.map((task) => task.createdBy))],
-    uniqueAssignees: [...new Set(tasks.map((task) => task.assignedTo))],
+    filters: watch(),
+    resetFilters: () => reset(),
+    uniqueCreators,
+    uniqueAssignees,
   };
 };

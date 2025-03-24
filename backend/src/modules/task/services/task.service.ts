@@ -31,6 +31,10 @@ export class TaskService {
         taskOrder: dto.taskOrder ?? task.taskOrder,
         updatedAt: new Date(),
       },
+      include: {
+        creator: { select: { id: true, name: true } },
+        assignee: { select: { id: true, name: true } },
+      },
     });
 
     return {
@@ -52,6 +56,10 @@ export class TaskService {
         updatedAt: new Date(),
         deletedAt: null,
       },
+      include: {
+        creator: { select: { id: true, name: true } },
+        assignee: { select: { id: true, name: true } },
+      },
     });
 
     return {
@@ -62,14 +70,26 @@ export class TaskService {
 
   async getAllTasks(filterDto: TaskFilterDto) {
     const where = this.buildTaskFilter(filterDto);
-
+  
     const tasks = await this.prisma.task.findMany({
       where,
       orderBy: { taskOrder: "asc" },
+      include: {
+        creator: { select: { id: true, name: true } },
+        assignee: { select: { id: true, name: true } },
+      },
     });
-
-    return { message: "Filtered tasks retrieved successfully", tasks };
+  
+    return {
+      message: "Filtered tasks retrieved successfully",
+      tasks: tasks.map((task) => ({
+        ...task,
+        createdBy: task.creator,
+        assignedTo: task.assignee,
+      })),
+    };
   }
+  
 
   private buildTaskFilter(filterDto: TaskFilterDto) {
     const { status, createdBy, assignedTo } = filterDto;

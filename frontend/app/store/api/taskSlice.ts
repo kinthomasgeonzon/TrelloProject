@@ -17,7 +17,10 @@ export const tasksApi = createApi({
   baseQuery,
   tagTypes: ["Tasks", "Users"],
   endpoints: (builder) => ({
-    getAllTasks: builder.query<any[], Partial<{ status: string; createdBy: string; assignedTo: string }>>({
+    getAllTasks: builder.query<
+      any[],
+      Partial<{ status: string; createdBy: string; assignedTo: string }>
+    >({
       query: (filters) => {
         const filteredParams = Object.fromEntries(
           Object.entries(filters || {}).filter(([_, value]) => value && value !== "ALL")
@@ -26,14 +29,19 @@ export const tasksApi = createApi({
         return {
           url: "tasks",
           method: "GET",
-          params: filteredParams, 
+          params: filteredParams,
         };
       },
-      transformResponse: (response: any) => response?.tasks ?? [],
+      transformResponse: (response: any) =>
+        response?.tasks.map((task: any) => ({
+          ...task,
+          createdBy: task.createdBy || null,
+          assignedTo: task.assignedTo || null,
+        })) ?? [],
       providesTags: ["Tasks"],
     }),
 
-    getAllUsers: builder.query<{ id: string; name: string }[], void>({
+    getAllUsers: builder.query<{ id: number; name: string }[], void>({
       query: () => ({
         url: "users",
         method: "GET",
@@ -54,3 +62,4 @@ export const tasksApi = createApi({
 });
 
 export const { useGetAllTasksQuery, useGetAllUsersQuery, useCreateTaskMutation } = tasksApi;
+

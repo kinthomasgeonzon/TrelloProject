@@ -27,7 +27,7 @@ interface AuthenticatedRequest extends Request {
 @Controller('tasks')
 @UseGuards(TaskAuthGuard)
 export class TaskController {
-  constructor(private readonly taskService: TaskService) {}
+  constructor(private readonly taskService: TaskService) { }
 
   @Patch(':id')
   async editTask(

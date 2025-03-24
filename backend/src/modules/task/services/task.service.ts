@@ -1,15 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Status } from '@prisma/client';
-import { PrismaService } from '../../../prisma.service';
-import { CreateTaskDto } from '../dto/req.create-task.dto';
-import { EditTaskDto } from '../dto/req.edittasks.dto';
-import { TaskFilterDto } from '../dto/req.task-filter.dto';
-import { ResCreateTaskDto } from '../dto/res.create-task.dto';
-import { ResEditTaskDto } from '../dto/res.edittask.dto';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { Status } from "@prisma/client";
+import { PrismaService } from "../../../prisma.service";
+import { CreateTaskDto } from "../dto/req.create-task.dto";
+import { EditTaskDto } from "../dto/req.edittasks.dto";
+import { TaskFilterDto } from "../dto/req.task-filter.dto";
+import { ResCreateTaskDto } from "../dto/res.create-task.dto";
+import { ResEditTaskDto } from "../dto/res.edittask.dto";
 
 @Injectable()
 export class TaskService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async editTask(id: number, dto: EditTaskDto): Promise<ResEditTaskDto> {
     const task = await this.prisma.task.findUnique({
@@ -27,14 +27,14 @@ export class TaskService {
         description: dto.description ?? task.description,
         dueDate: dto.dueDate ?? task.dueDate,
         status: dto.status ?? task.status,
-        assignedTo: dto.assignedTo ? Number(dto.assignedTo) : task.assignedTo,
+        assignedTo: dto.assignedTo ?? task.assignedTo,
         taskOrder: dto.taskOrder ?? task.taskOrder,
         updatedAt: new Date(),
       },
     });
 
     return {
-      message: 'Task updated successfully',
+      message: "Task updated successfully",
       task: updatedTask,
     };
   }
@@ -46,46 +46,45 @@ export class TaskService {
         description: dto.description ?? null,
         dueDate: dto.dueDate ?? null,
         status: Status.TODO,
-        assignedTo: dto.assignedTo ? Number(dto.assignedTo) : null,
+        assignedTo: dto.assignedTo ?? null,
         taskOrder: dto.taskOrder ?? 0,
-        createdBy: Number(dto.createdBy),
+        createdBy: dto.createdBy,
         updatedAt: new Date(),
-        deletedAt: null
+        deletedAt: null,
       },
     });
 
     return {
-      message: 'Task created successfully',
+      message: "Task created successfully",
       task,
     };
   }
 
   async getAllTasks(filterDto: TaskFilterDto) {
     const where = this.buildTaskFilter(filterDto);
-  
+
     const tasks = await this.prisma.task.findMany({
       where,
       orderBy: { taskOrder: "asc" },
     });
-  
+
     return { message: "Filtered tasks retrieved successfully", tasks };
   }
-  
 
   private buildTaskFilter(filterDto: TaskFilterDto) {
     const { status, createdBy, assignedTo } = filterDto;
     const where: any = { deletedAt: null };
 
-    if (status && status !== 'ALL' && Object.values(Status).includes(status as Status)) {
-      where.status = status as Status;
+    if (status && Object.values(Status).includes(status)) {
+      where.status = status;
     }
 
-    if (createdBy && createdBy !== 'ALL' && !isNaN(Number(createdBy))) {
-      where.createdBy = Number(createdBy);
+    if (createdBy) {
+      where.createdBy = createdBy;
     }
 
-    if (assignedTo && assignedTo !== 'ALL' && !isNaN(Number(assignedTo))) {
-      where.assignedTo = Number(assignedTo);
+    if (assignedTo) {
+      where.assignedTo = assignedTo;
     }
 
     return where;
@@ -107,5 +106,4 @@ export class TaskService {
 
     return { message: "Task soft deleted successfully" };
   }
-
 }

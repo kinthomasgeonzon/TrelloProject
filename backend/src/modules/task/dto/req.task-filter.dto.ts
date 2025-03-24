@@ -1,15 +1,19 @@
-import { IsOptional, IsString } from 'class-validator';
+import { Status } from "@prisma/client";
+import { Transform } from "class-transformer";
+import { IsEnum, IsNumber, IsOptional } from "class-validator";
 
 export class TaskFilterDto {
   @IsOptional()
-  @IsString()
-  status?: string;
+  @IsEnum(Status)
+  status?: Status;
 
   @IsOptional()
-  @IsString()
-  createdBy?: string;
+  @Transform(({ value }) => (value ? Number(value) : undefined))
+  @IsNumber()
+  createdBy?: number;
 
   @IsOptional()
-  @IsString()
-  assignedTo?: string;
+  @Transform(({ value }) => (value ? Number(value) : undefined))
+  @IsNumber()
+  assignedTo?: number;
 }

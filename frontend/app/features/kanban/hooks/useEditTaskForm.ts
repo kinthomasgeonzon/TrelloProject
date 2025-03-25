@@ -34,7 +34,6 @@ export function useEditTaskForm(task: Task, onClose: () => void) {
         dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : null,
       }).unwrap();
     } catch (err) {
-      console.error("Error updating task", err);
     } finally {
       reset();
       setIsOpen(false);

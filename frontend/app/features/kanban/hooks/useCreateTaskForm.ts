@@ -27,7 +27,6 @@ export function useCreateTaskForm() {
         taskOrder: 1, //temporary
       }).unwrap();
     } catch (err) {
-      console.error("Error creating task", err);
     } finally {
       reset();
       setIsOpen(false);

@@ -11,7 +11,7 @@ export const useSignup = () => {
   const [signupUser, { isLoading: loading, isSuccess: success }] = useSignupUserMutation();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<SignupFormData>({
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
   });
 
@@ -31,10 +31,9 @@ export const useSignup = () => {
       await signupUser(data).unwrap();
       router.push("/login");
     } catch (err) {
-      console.error("Signup failed:", err);
       setErrorMessage(getErrorMessage(err));
     } finally {
-      console.log("Signup process completed.");
+      reset();
     }
   };
 

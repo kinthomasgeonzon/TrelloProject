@@ -1,7 +1,8 @@
+import { store } from "@/app/store/store";
 import "bulma/css/bulma.min.css";
 import type { AppProps } from "next/app";
 import { Provider } from "react-redux";
-import { store } from "@/app/store/store";
+import "../app/globals.css";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (

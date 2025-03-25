@@ -1,5 +1,4 @@
 "use client";
-
 import { DragDropContext } from "@hello-pangea/dnd";
 import { useGetAllTasksQuery } from "@store/api/taskSlice";
 import { useAuth } from "../hooks/useAuth";
@@ -13,22 +12,11 @@ import Sidebar from "./Sidebar";
 import TaskFilter from "./TaskFilter";
 
 const KanbanBoard: React.FC = () => {
-  const {
-    register,
-    handleSubmit,
-    resetFilters,
-    applyFilters,
-    uniqueCreators,
-    uniqueAssignees,
-    filters,
-  } = useTaskFilters();
+  const { register, handleSubmit, resetFilters, applyFilters, uniqueCreators, uniqueAssignees, filters } = useTaskFilters();
+  const { data: tasks = [] } = useGetAllTasksQuery(filters);
 
-  const { data: tasks = [], error, isLoading } = useGetAllTasksQuery(filters);
   const { onDragEnd } = useTaskDragAndDrop();
   const { userRole } = useAuth();
-
-  if (isLoading) return <p className="notification is-info">Loading tasks...</p>;
-  if (error) return <p className="notification is-danger">Error loading tasks.</p>;
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -38,21 +26,19 @@ const KanbanBoard: React.FC = () => {
         <TaskFilter
           register={register}
           handleSubmit={handleSubmit}
-          applyFilters={() => applyFilters()}
-          resetFilters={() => resetFilters()}
+          applyFilters={applyFilters}
+          resetFilters={resetFilters}
           uniqueCreators={uniqueCreators}
           uniqueAssignees={uniqueAssignees}
         />
-        <CreateTaskForm />
-
+        {userRole === "ADMIN" && <CreateTaskForm />}
         <div className={`${styles.kanbanBoard} columns is-variable is-4`}>
           {["TODO", "IN_PROGRESS", "DONE"].map((status) => (
-            <DroppableColumn key={status} status={status} tasks={tasks} isLoading={isLoading} />
+            <DroppableColumn key={status} status={status} tasks={tasks} />
           ))}
         </div>
       </div>
     </DragDropContext>
   );
 };
-
 export default KanbanBoard;

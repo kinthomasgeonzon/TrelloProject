@@ -37,7 +37,7 @@ export function useCreateTaskForm() {
         dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : null,
         status: "TODO",
         createdBy: userId,
-        taskOrder: 1,
+        taskOrder: 1, //default
       }).unwrap();
 
       reset();

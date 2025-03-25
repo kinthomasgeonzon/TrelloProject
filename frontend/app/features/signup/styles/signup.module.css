@@ -3,22 +3,24 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #121212;
+  width: 100vw;
+  background: url("https://media.tenor.com/YOUR-GIF-URL.gif") no-repeat center center fixed;
+  background-size: cover;
 }
 
 .signupBox {
   width: 100%;
-  max-width: 350px; 
-  padding: 25px;
-  background-color: #2a2a2a;
-  border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+  padding: 30px;
+  background-color: rgba(42, 42, 42, 0.9);
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
   text-align: center;
 }
 
 .signupBox h2 {
   color: #ffffff;
-  font-size: 20px;
+  font-size: 22px;
   margin-bottom: 15px;
 }
 
@@ -33,13 +35,13 @@
 
 .input {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   margin-bottom: 15px;
-  border-radius: 5px;
-  border: 1px solid #444;
-  background-color: #333;
+  border-radius: 6px;
+  border: 1px solid #555;
+  background-color: #2a2a2a;
   color: #fff;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .input:focus {
@@ -47,6 +49,9 @@
   outline: none;
 }
 
-.button:hover {
-  background-color: #0056b3;
+@media (max-width: 500px) {
+  .signupBox {
+    max-width: 90%;
+    padding: 20px;
+  }
 }

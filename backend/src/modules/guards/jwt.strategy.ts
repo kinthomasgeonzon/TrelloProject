@@ -17,15 +17,16 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     const user = await this.prisma.user.findUnique({
       where: { id: payload.id },
     });
-
+  
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
-
-    if (user.role !== 'ADMIN') {
+  
+    if (user.role !== 'ADMIN' && user.role !== 'MEMBER') {
       throw new UnauthorizedException('Invalid role assigned to user.');
     }
-
+  
     return user;
   }
+  
 }

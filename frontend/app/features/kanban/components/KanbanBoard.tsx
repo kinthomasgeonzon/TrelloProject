@@ -23,7 +23,7 @@ const KanbanBoard: React.FC = () => {
 
   return (
     <div className={styles.kanbanContainer}>
-      {/* Task Filter */}
+ 
       <TaskFilter
         register={register}
         handleSubmit={handleSubmit}
@@ -36,10 +36,8 @@ const KanbanBoard: React.FC = () => {
         uniqueAssignees={uniqueAssignees}
       />
 
-      {/* Create Task Form */}
       <CreateTaskForm />
 
-      {/* Kanban Columns */}
       <div className={`${styles.kanbanBoard} columns is-variable is-4`}>
         {["TODO", "IN_PROGRESS", "DONE"].map((status) => (
           <div key={status} className="column is-one-third">

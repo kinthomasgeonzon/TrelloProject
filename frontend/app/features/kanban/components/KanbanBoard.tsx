@@ -4,12 +4,12 @@ import { useGetAllTasksQuery } from "@store/api/taskSlice";
 import { useState } from "react";
 import { useTaskFilters } from "../hooks/useTaskFilters";
 import styles from "../styles/kanban.module.css";
+import CreateTaskForm from "./CreateTaskForm";
+import DeleteTaskButton from "./DeleteTask";
 import TaskFilter from "./TaskFilter";
 
 const KanbanBoard: React.FC = () => {
-  const { register, handleSubmit, resetFilters, applyFilters, getFilteredQuery, uniqueCreators, uniqueAssignees } =
-    useTaskFilters();
-
+  const { register, handleSubmit, resetFilters, applyFilters, getFilteredQuery, uniqueCreators, uniqueAssignees } = useTaskFilters();
   const [filters, setFilters] = useState(getFilteredQuery());
   const { data: tasksData, error, isLoading } = useGetAllTasksQuery(filters);
   const tasks = Array.isArray(tasksData) ? tasksData : [];
@@ -31,6 +31,8 @@ const KanbanBoard: React.FC = () => {
         uniqueAssignees={uniqueAssignees}
       />
 
+      <CreateTaskForm />
+
       <div className={`${styles.kanbanBoard} columns is-variable is-4`}>
         {["TODO", "IN_PROGRESS", "DONE"].map((status) => (
           <div key={status} className="column is-one-third">
@@ -45,6 +47,7 @@ const KanbanBoard: React.FC = () => {
                     <div key={task.id} className="card mb-3">
                       <header className="card-header">
                         <p className="card-header-title">{task.title}</p>
+                        <DeleteTaskButton taskId={Number(task.id)} />
                       </header>
                       <div className="card-content">
                         <p>{task.description}</p>

@@ -2,7 +2,7 @@
 
 import { Droppable } from "@hello-pangea/dnd";
 import styles from "../styles/kanban.module.css";
-import DraggableTask from "./DraggableTask";
+import DeleteTaskButton from "./DeleteTask";
 
 interface DroppableColumnProps {
   status: string;
@@ -14,9 +14,10 @@ interface DroppableColumnProps {
     assignedTo: string;
     status: string;
   }[];
+  isLoading?: boolean;
 }
 
-const DroppableColumn: React.FC<DroppableColumnProps> = ({ status, tasks }) => {
+const DroppableColumn: React.FC<DroppableColumnProps> = ({ status, tasks, isLoading }) => {
   const filteredTasks = tasks
     .filter((task) => task.status === status)
     .map((task) => ({
@@ -34,9 +35,26 @@ const DroppableColumn: React.FC<DroppableColumnProps> = ({ status, tasks }) => {
             {...provided.droppableProps}
             className={`box has-background-light p-3 ${snapshot.isDraggingOver ? styles.draggingOver : ""}`}
           >
-            {filteredTasks.map((task, index) => (
-              <DraggableTask key={task.id} task={task} index={index} />
-            ))}
+            {isLoading ? (
+              <p className="has-text-centered has-text-grey-light">Loading tasks...</p>
+            ) : filteredTasks.length === 0 ? (
+              <p className="has-text-centered has-text-grey-light">No tasks available.</p>
+            ) : (
+              filteredTasks.map((task, index) => (
+                <div key={task.id} className="card mb-3">
+                  <header className="card-header">
+                    <p className="card-header-title">{task.title}</p>
+                    <DeleteTaskButton taskId={task.id} />
+                  </header>
+                  <div className="card-content">
+                    <p>{task.description}</p>
+                    <p className="has-text-grey">
+                      Created By: {task.createdBy} | Assigned To: {task.assignedTo}
+                    </p>
+                  </div>
+                </div>
+              ))
+            )}
             {provided.placeholder}
           </div>
         )}

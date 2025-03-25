@@ -44,7 +44,6 @@ export const useTaskDragAndDrop = () => {
 
       await Promise.all(promises);
     } catch (err) {
-      console.error("Failed to update task:", err);
     } finally {
       setIsDragging(false);
     }

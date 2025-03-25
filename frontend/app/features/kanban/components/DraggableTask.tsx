@@ -2,6 +2,7 @@
 
 import { Draggable } from "@hello-pangea/dnd";
 import styles from "../styles/kanban.module.css";
+import DeleteTaskButton from "./DeleteTask";
 
 interface DraggableTaskProps {
   task: {
@@ -26,6 +27,7 @@ const DraggableTask: React.FC<DraggableTaskProps> = ({ task, index }) => {
         >
           <header className="card-header">
             <p className="card-header-title">{task.title}</p>
+            <DeleteTaskButton taskId={task.id} />
           </header>
           <div className="card-content">
             <p>{task.description}</p>

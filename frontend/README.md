@@ -1,36 +1,138 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PRD Project
 
-## Getting Started
+A full-stack task management application built with Next.js and NestJS.
 
-First, run the development server:
+## Project Structure
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+PRDProject/
+├── frontend/         # Next.js frontend application
+└── backend/          # NestJS backend application
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Prerequisites
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Node.js (v18 or higher)
+- npm or yarn
+- PostgreSQL database
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Backend Setup
 
-## Learn More
+1. Navigate to the backend directory:
+```bash
+cd backend
+```
 
-To learn more about Next.js, take a look at the following resources:
+2. Install dependencies:
+```bash
+npm install
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. Set up environment variables:
+   - Copy `.env.example` to `.env` (if available)
+   - Configure your database connection and other environment variables
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. Set up the database:
+```bash
+npx prisma generate
+npx prisma migrate dev
+```
 
-## Deploy on Vercel
+5. Start the development server:
+```bash
+npm run start:dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The backend will be running at `http://localhost:3000`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Frontend Setup
+
+1. Navigate to the frontend directory:
+```bash
+cd frontend
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Start the development server:
+```bash
+npm run dev
+```
+
+The frontend will be running at `http://localhost:3001`
+
+## Features
+
+- Modern, responsive user interface
+- Task management capabilities
+- Real-time updates
+- RESTful API backend
+- PostgreSQL database
+- TypeScript for type safety
+
+## Technologies Used
+
+### Frontend
+- Next.js - React framework
+- TypeScript - Type safety
+- Geist - Modern font family by Vercel
+
+### Backend
+- NestJS - Node.js framework
+- Prisma - Database ORM
+- PostgreSQL - Database
+- TypeScript - Type safety
+
+## Development
+
+### Backend Development
+- The backend uses NestJS with a modular architecture
+- API endpoints are defined in the `src` directory
+- Database schema is managed through Prisma in the `prisma` directory
+
+### Frontend Development
+- The frontend uses Next.js with the App Router
+- Pages are located in the `app` directory
+- Components are stored in the `components` directory
+
+## Testing
+
+### Backend Tests
+```bash
+cd backend
+npm run test
+```
+
+### Frontend Tests
+```bash
+cd frontend
+npm run test
+```
+
+## Deployment
+
+### Backend Deployment
+1. Build the application:
+```bash
+cd backend
+npm run build
+```
+
+2. Start the production server:
+```bash
+npm run start:prod
+```
+
+### Frontend Deployment
+The frontend can be deployed using [Vercel](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme).
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request

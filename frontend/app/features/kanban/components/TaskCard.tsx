@@ -36,15 +36,13 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
 
       {isEditing && (
         <Modal onClose={() => setIsEditing(false)} isOpen={isEditing}>
-          <EditTaskForm
-            task={task}
-            isOpen={isEditing}
-            onClose={() => setIsEditing(false)}
-            closeModal={function (): void {
-              throw new Error("Function not implemented.");
-            }}
-          />
-        </Modal>
+        <EditTaskForm
+          task={task}
+          isOpen={isEditing}
+          onClose={() => setIsEditing(false)}
+          closeModal={() => setIsEditing(false)}
+        />
+      </Modal>
       )}
     </div>
   );

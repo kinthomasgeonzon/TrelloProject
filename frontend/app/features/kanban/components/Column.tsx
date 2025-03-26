@@ -10,8 +10,10 @@ interface DroppableColumnProps {
     id: number;
     title: string;
     description?: string;
-    createdBy: string;
-    assignedTo: string;
+    taskOrder: number;
+    createdAt: string;
+    createdBy: number;
+    assignedTo: number;
     status: string;
   }[];
 }

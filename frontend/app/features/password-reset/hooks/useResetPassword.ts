@@ -26,6 +26,7 @@ const useResetPassword = (): {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<ResetPasswordFormData>({
     resolver: zodResolver(resetPasswordSchema),
   });
@@ -38,11 +39,10 @@ const useResetPassword = (): {
     try {
       await resetPasswordMutation(data).unwrap();
       setMessage("A reset link has been sent.");
-    } catch (error: any) {
-      console.error("Error resetting password:", error);
-      setMessage(error.data?.message || "Something went wrong");
+    } catch {
+      setMessage("Something went wrong.");
     } finally {
-      console.log("Reset password request finished.");
+      reset();
     }
   };
 

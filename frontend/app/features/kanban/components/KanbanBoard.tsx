@@ -6,6 +6,7 @@ import { useTaskFilters } from "../hooks/useTaskFilters";
 import styles from "../styles/kanban.module.css";
 import CreateTaskForm from "./CreateTaskForm";
 import DeleteTaskButton from "./DeleteTask";
+import EditTaskForm from "./EditTaskForm";
 import TaskFilter from "./TaskFilter";
 
 const KanbanBoard: React.FC = () => {
@@ -14,11 +15,15 @@ const KanbanBoard: React.FC = () => {
   const { data: tasksData, error, isLoading } = useGetAllTasksQuery(filters);
   const tasks = Array.isArray(tasksData) ? tasksData : [];
 
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+
   if (isLoading) return <p className="notification is-info">Loading tasks...</p>;
   if (error) return <p className="notification is-danger">Error loading tasks.</p>;
 
   return (
     <div className={styles.kanbanContainer}>
+ 
       <TaskFilter
         register={register}
         handleSubmit={handleSubmit}
@@ -55,6 +60,17 @@ const KanbanBoard: React.FC = () => {
                           Created By: {task.createdBy} | Assigned To: {task.assignedTo}
                         </p>
                       </div>
+                      <footer className="card-footer">
+                        <button
+                          className="card-footer-item button is-small is-info"
+                          onClick={() => {
+                            setSelectedTask(task);
+                            setIsEditOpen(true);
+                          }}
+                        >
+                          Edit
+                        </button>
+                      </footer>
                     </div>
                   ))
               )}
@@ -62,6 +78,14 @@ const KanbanBoard: React.FC = () => {
           </div>
         ))}
       </div>
+
+      {selectedTask && (
+        <EditTaskForm
+          task={selectedTask}
+          isOpen={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+          closeModal={() => setIsEditOpen(false)}/>
+      )}
     </div>
   );
 };

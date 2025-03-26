@@ -23,14 +23,13 @@ export function useCreateTaskForm() {
         ...data,
         dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : null,
         status: "TODO",
-        createdBy: 1, //temporary 
+        createdBy: 1, //temporary
         taskOrder: 1, //temporary
       }).unwrap();
-
+    } catch (err) {
+    } finally {
       reset();
       setIsOpen(false);
-    } catch (err) {
-      console.error("Error creating task", err);
     }
   };
 

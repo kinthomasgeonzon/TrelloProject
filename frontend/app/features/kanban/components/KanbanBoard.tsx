@@ -1,93 +1,44 @@
 "use client";
-
+import { DragDropContext } from "@hello-pangea/dnd";
 import { useGetAllTasksQuery } from "@store/api/taskSlice";
-import { useState } from "react";
+import { useAuth } from "../hooks/useAuth";
+import { useTaskDragAndDrop } from "../hooks/useTaskDragAndDrop";
 import { useTaskFilters } from "../hooks/useTaskFilters";
 import styles from "../styles/kanban.module.css";
+import DroppableColumn from "./Column";
 import CreateTaskForm from "./CreateTaskForm";
-import DeleteTaskButton from "./DeleteTask";
-import EditTaskForm from "./EditTaskForm";
+import LogoutButton from "./LogOut";
+import Sidebar from "./Sidebar";
 import TaskFilter from "./TaskFilter";
 
 const KanbanBoard: React.FC = () => {
-  const { register, handleSubmit, resetFilters, applyFilters, getFilteredQuery, uniqueCreators, uniqueAssignees } = useTaskFilters();
-  const [filters, setFilters] = useState(getFilteredQuery());
-  const { data: tasksData, error, isLoading } = useGetAllTasksQuery(filters);
-  const tasks = Array.isArray(tasksData) ? tasksData : [];
+  const { register, handleSubmit, resetFilters, applyFilters, uniqueCreators, uniqueAssignees, filters } = useTaskFilters();
+  const { data: tasks = [] } = useGetAllTasksQuery(filters);
 
-  const [selectedTask, setSelectedTask] = useState(null);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-
-  if (isLoading) return <p className="notification is-info">Loading tasks...</p>;
-  if (error) return <p className="notification is-danger">Error loading tasks.</p>;
+  const { onDragEnd } = useTaskDragAndDrop();
+  const { userRole } = useAuth();
 
   return (
-    <div className={styles.kanbanContainer}>
- 
-      <TaskFilter
-        register={register}
-        handleSubmit={handleSubmit}
-        applyFilters={(data) => setFilters(data)}
-        resetFilters={() => {
-          resetFilters();
-          setFilters(getFilteredQuery());
-        }}
-        uniqueCreators={uniqueCreators}
-        uniqueAssignees={uniqueAssignees}
-      />
-
-      <CreateTaskForm />
-
-      <div className={`${styles.kanbanBoard} columns is-variable is-4`}>
-        {["TODO", "IN_PROGRESS", "DONE"].map((status) => (
-          <div key={status} className="column is-one-third">
-            <h3 className="title is-4 has-text-centered">{status.replace("_", " ")}</h3>
-            <div className="box has-background-light p-3">
-              {tasks.filter((task) => task.status === status).length === 0 ? (
-                <p className="has-text-centered has-text-grey-light">No tasks available.</p>
-              ) : (
-                tasks
-                  .filter((task) => task.status === status)
-                  .map((task) => (
-                    <div key={task.id} className="card mb-3">
-                      <header className="card-header">
-                        <p className="card-header-title">{task.title}</p>
-                        <DeleteTaskButton taskId={Number(task.id)} />
-                      </header>
-                      <div className="card-content">
-                        <p>{task.description}</p>
-                        <p className="has-text-grey">
-                          Created By: {task.createdBy} | Assigned To: {task.assignedTo}
-                        </p>
-                      </div>
-                      <footer className="card-footer">
-                        <button
-                          className="card-footer-item button is-small is-info"
-                          onClick={() => {
-                            setSelectedTask(task);
-                            setIsEditOpen(true);
-                          }}
-                        >
-                          Edit
-                        </button>
-                      </footer>
-                    </div>
-                  ))
-              )}
-            </div>
-          </div>
-        ))}
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div className={styles.kanbanContainer}>
+        <LogoutButton />
+        <Sidebar userRole={userRole} />
+        <TaskFilter
+          register={register}
+          handleSubmit={handleSubmit}
+          applyFilters={applyFilters}
+          resetFilters={resetFilters}
+          uniqueCreators={uniqueCreators}
+          uniqueAssignees={uniqueAssignees}
+        />
+        {userRole === "ADMIN" && <CreateTaskForm />}
+        <div className={`${styles.kanbanBoard} columns is-variable is-4`}>
+          {["TODO", "IN_PROGRESS", "DONE"].map((status) => (
+            <DroppableColumn key={status} status={status} tasks={tasks} />
+          ))}
+        </div>
       </div>
-
-      {selectedTask && (
-        <EditTaskForm
-          task={selectedTask}
-          isOpen={isEditOpen}
-          onClose={() => setIsEditOpen(false)}
-          closeModal={() => setIsEditOpen(false)}/>
-      )}
-    </div>
+    </DragDropContext>
   );
 };
-
 export default KanbanBoard;

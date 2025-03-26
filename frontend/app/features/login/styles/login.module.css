@@ -1,38 +1,80 @@
 .loginContainer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh; 
-  }
-  
-  .loginBox {
-    width: 100%;
-    max-width: 400px;
-    padding: 20px;
-    background-color: #222; 
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    text-align: center;
-  }
-  
-  .label {
-    display: block;
-    text-align: left;
-    margin-bottom: 5px;
-  }
-  
-  .input {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-  }
-  
-  .button {
-    width: 100%;
-  }
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; 
+  width: 100vw;
+  background-size: cover;
+}
 
-  .disabledLink {
-    color: gray;
-    cursor: not-allowed;
-    text-decoration: none;
+.loginBox {
+  width: 100%;
+  max-width: 400px;
+  padding: 25px;
+  background-color: rgba(34, 34, 34, 0.85);
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+}
+
+.loginBox h2 {
+  color: #ffffff;
+  font-size: 22px;
+  margin-bottom: 15px;
+}
+
+.label {
+  display: block;
+  text-align: left;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background-color: #333;
+  color: #fff;
+  font-size: 15px;
+}
+
+.input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.disabledLink {
+  color: gray;
+  cursor: not-allowed;
+  text-decoration: none;
+  display: block;
+  margin-top: 10px;
+  pointer-events: none;
+}
+
+.activeLink {
+  color: white;
+  cursor: pointer;
+  text-decoration: underline;
+  display: block;
+  margin-top: 10px;
+  transition: color 0.3s ease;
+}
+
+.activeLink:hover {
+  color: #007bff;
+}
+
+@media (max-width: 500px) {
+  .loginBox {
+      max-width: 90%;
+      padding: 20px;
   }
+}

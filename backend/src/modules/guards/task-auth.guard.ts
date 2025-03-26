@@ -1,8 +1,4 @@
-import {
-  ForbiddenException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Role } from '@prisma/client';
 
@@ -12,9 +8,9 @@ export class TaskAuthGuard extends AuthGuard('jwt') {
     if (err || !user) {
       throw new UnauthorizedException('Unauthorized access');
     }
-    
-    if (user.role !== 'ADMIN') {
-      throw new ForbiddenException('Access denied: Admins only');
+
+    if (user.role !== 'ADMIN' && user.role !== 'MEMBER') {
+      throw new ForbiddenException('Access denied: Only Admins and Members are allowed');
     }
 
     return user;

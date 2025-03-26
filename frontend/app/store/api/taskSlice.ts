@@ -25,7 +25,6 @@ export const tasksApi = createApi({
         const filteredParams = Object.fromEntries(
           Object.entries(filters || {}).filter(([_, value]) => value && value !== "ALL")
         );
-
         return {
           url: "tasks",
           method: "GET",
@@ -59,6 +58,24 @@ export const tasksApi = createApi({
       invalidatesTags: ["Tasks"],
     }),
 
+    updateTaskStatus: builder.mutation<void, { taskId: number; newStatus: string }>({
+      query: ({ taskId, newStatus }) => ({
+        url: `tasks/${taskId}/status`,
+        method: "POST",
+        body: { status: newStatus },
+      }),
+      invalidatesTags: ["Tasks"],
+    }),
+
+    updateTaskOrder: builder.mutation<void, { taskId: number; taskOrder: number }>({
+      query: ({ taskId, taskOrder }) => ({
+        url: `tasks/${taskId}/task-order`,
+        method: "PATCH",
+        body: { taskOrder },
+      }),
+      invalidatesTags: ["Tasks"],
+    }),
+
     editTask: builder.mutation({
       query: ({ id, ...updatedTask }) => ({
         url: `tasks/${id}`,
@@ -82,6 +99,8 @@ export const {
   useGetAllTasksQuery,
   useGetAllUsersQuery,
   useCreateTaskMutation,
+  useUpdateTaskStatusMutation,
+  useUpdateTaskOrderMutation,
   useEditTaskMutation,
-  useDeleteTaskMutation
+  useDeleteTaskMutation,
 } = tasksApi;

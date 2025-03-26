@@ -3,7 +3,6 @@
 import Button from "@components/button/Button";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import styles from "../styles/LogoutButton.module.css";
 
 const LogoutButton: React.FC = () => {
   const router = useRouter();
@@ -27,7 +26,7 @@ const LogoutButton: React.FC = () => {
   }, []);
 
   return (
-    <div className={styles.logoutButton}>
+    <div>
       <Button onClick={handleLogout}>Logout</Button>
     </div>
   );

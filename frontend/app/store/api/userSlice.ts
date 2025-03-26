@@ -5,14 +5,19 @@ export interface User {
   name: string;
 }
 
+const BASE_URL =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:3000"
+    : process.env.PRODUCTION_BE_URL || "https://trelloproject-1.onrender.com";
+
 export const userApi = createApi({
-    reducerPath: "userApi",
-    baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:4000" }),
-    endpoints: (builder) => ({
-      getAllUsers: builder.query<User[], void>({
-        query: () => "/users",
-      }),
+  reducerPath: "userApi",
+  baseQuery: fetchBaseQuery({ baseUrl: `${BASE_URL}/` }),
+  endpoints: (builder) => ({
+    getAllUsers: builder.query<User[], void>({
+      query: () => "/users",
     }),
-  });
+  }),
+});
 
 export const { useGetAllUsersQuery } = userApi;

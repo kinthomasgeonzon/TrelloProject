@@ -11,10 +11,15 @@ interface RequestResetPasswordData {
   email: string;
 }
 
+const BASE_URL =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:3000"
+    : process.env.PRODUCTION_BE_URL || "https://trelloproject-1.onrender.com"; 
+
 export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:4000/auth",
+    baseUrl: `${BASE_URL}/auth`,
     credentials: "include",
   }),
   endpoints: (builder) => ({
@@ -26,9 +31,7 @@ export const authApi = createApi({
         headers: { "Content-Type": "application/json" },
       }),
     }),
-    loginUser: builder.mutation<{
-        user: any; token: string; role: string 
-}, LoginFormData>({ 
+    loginUser: builder.mutation<{ user: any; token: string; role: string }, LoginFormData>({
       query: (userData) => ({
         url: "/login",
         method: "POST",

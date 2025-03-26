@@ -1,7 +1,12 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+const BASE_URL =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:3000"
+    : process.env.PRODUCTION_BE_URL || "https://trelloproject-1.onrender.com";
+
 const baseQuery = fetchBaseQuery({
-  baseUrl: "http://localhost:4000/",
+  baseUrl: `${BASE_URL}/`,
   credentials: "include",
   prepareHeaders: (headers) => {
     const token = localStorage.getItem("token");

@@ -17,7 +17,10 @@ export const tasksApi = createApi({
   baseQuery,
   tagTypes: ["Tasks", "Users"],
   endpoints: (builder) => ({
-    getAllTasks: builder.query<any[], Partial<{ status: string; createdBy: string; assignedTo: string }>>({
+    getAllTasks: builder.query<
+      any[],
+      Partial<{ status: string; createdBy: string; assignedTo: string }>
+    >({
       query: (filters) => {
         const filteredParams = Object.fromEntries(
           Object.entries(filters || {}).filter(([_, value]) => value && value !== "ALL")
@@ -73,6 +76,15 @@ export const tasksApi = createApi({
       invalidatesTags: ["Tasks"],
     }),
 
+    editTask: builder.mutation({
+      query: ({ id, ...updatedTask }) => ({
+        url: `tasks/${id}`,
+        method: "PATCH",
+        body: updatedTask,
+      }),
+      invalidatesTags: ["Tasks"],
+    }),
+
     deleteTask: builder.mutation({
       query: (taskId) => ({
         url: `tasks/${taskId}`,
@@ -89,5 +101,6 @@ export const {
   useCreateTaskMutation,
   useUpdateTaskStatusMutation,
   useUpdateTaskOrderMutation,
+  useEditTaskMutation,
   useDeleteTaskMutation,
 } = tasksApi;

@@ -34,6 +34,7 @@ const useResetPassword = (): {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<ResetPasswordFormData>({
     resolver: zodResolver(resetPasswordSchema),
   });

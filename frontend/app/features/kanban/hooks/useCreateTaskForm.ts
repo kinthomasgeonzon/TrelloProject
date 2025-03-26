@@ -39,9 +39,6 @@ export function useCreateTaskForm() {
         createdBy: userId,
         taskOrder: 1, //default
       }).unwrap();
-
-      reset();
-      setIsOpen(false);
     } catch (err) {
     }finally {
       reset();

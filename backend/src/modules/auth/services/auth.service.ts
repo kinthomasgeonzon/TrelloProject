@@ -90,27 +90,35 @@ export class AuthService {
 
   async resetPassword(email: string) {
     const user = await this.prisma.user.findUnique({ where: { email } });
-
+  
     if (!user) {
       throw new NotFoundException('User not found');
     }
-
+  
     const passwordResetToken = await this.jwtService.signAsync(
       { userId: user.id },
-      { expiresIn: '1h' },
+      { expiresIn: '1h' }
     );
-
+  
     await this.prisma.user.update({
       where: { email },
       data: { passwordResetToken },
     });
+  
     console.log(
       `Generated password reset token for ${email}:`,
-      passwordResetToken,
+      passwordResetToken
     );
 
-    const resetLink = `http://localhost:3000/update-password?token=${encodeURIComponent(passwordResetToken)}`;
-
+    const feBaseUrl =
+      process.env.NODE_ENV === 'production'
+        ? process.env.SERVER_FE_URL
+        : process.env.LOCAL_FE_URL;
+  
+    const resetLink = `${feBaseUrl}/update-password?token=${encodeURIComponent(
+      passwordResetToken
+    )}`;
+  
     try {
       await this.resend.emails.send({
         from: 'taskman@resend.dev',
@@ -118,18 +126,17 @@ export class AuthService {
         subject: 'Password Reset Request',
         html: `<p>Hi ${user.name},</p><p>Click <a href="${resetLink}">here</a> to reset your password.</p>`,
       });
-
+  
       return { message: 'Password reset link sent!' };
     } catch (error: unknown) {
-      console.error(
-        'Failed to send email:',
-        error instanceof Error ? error.message : error,
-      );
+        error instanceof Error ? error.message : error
+
       throw new InternalServerErrorException(
-        'Failed to send email. Please try again later.',
+        'Failed to send email. Please try again later.'
       );
     }
   }
+  
 
   async updatePassword({ token, newPassword }: ReqResetPasswordDto) {
     try {

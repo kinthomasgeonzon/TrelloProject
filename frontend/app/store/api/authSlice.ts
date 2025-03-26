@@ -13,8 +13,8 @@ interface RequestResetPasswordData {
 
 const BASE_URL =
   process.env.NODE_ENV === "development"
-    ? "http://localhost:3000"
-    : process.env.PRODUCTION_BE_URL || "https://trelloproject-1.onrender.com"; 
+    ? process.env.NEXT_PUBLIC_LOCAL_BE_URL
+    : process.env.NEXT_PUBLIC_PRODUCTION_BE_URL;
 
 export const authApi = createApi({
   reducerPath: "authApi",

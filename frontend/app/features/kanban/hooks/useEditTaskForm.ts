@@ -36,6 +36,8 @@ export function useEditTaskForm(task: Task, onClose: () => void) {
 
   const onSubmit = async (data: TaskSchema) => {
     try {
+      const assignedToId = data.assignedTo ? Number(data.assignedTo) : null;
+
       await editTask({
         id: task.id,
         ...data,
@@ -43,6 +45,7 @@ export function useEditTaskForm(task: Task, onClose: () => void) {
         dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : null,
       }).unwrap();
     } catch (err) {
+      console.error("Failed to update task", err);
     } finally {
       reset();
       onClose();

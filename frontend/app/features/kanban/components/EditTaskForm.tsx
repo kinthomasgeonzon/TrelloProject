@@ -48,7 +48,13 @@ const EditTaskForm: React.FC<EditTaskFormProps> = ({
 
         <div className="field">
           <label className="label">Assigned To</label>
-          <input className="input" type="number" {...register("assignedTo")} />
+          <input
+            className="input"
+            type="number"
+            min="0"
+            {...register("assignedTo", { min: 0 })}
+          />
+          {errors.assignedTo && <p className="help is-danger">Assigned To must be a positive number</p>}
         </div>
 
         <div className="field">

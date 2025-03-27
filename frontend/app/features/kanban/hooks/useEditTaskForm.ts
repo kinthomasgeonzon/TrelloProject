@@ -20,7 +20,7 @@ export function useEditTaskForm(task: Task, onClose: () => void) {
       title: task.title,
       taskOrder: Number(task.taskOrder),
       description: task.description,
-      assignedTo: task.assignedTo ? Number(task.assignedTo) : undefined,
+      assignedTo: task.assignedTo && task.assignedTo >= 0 ? Number(task.assignedTo) : undefined,
       status: task.status || "TODO", 
       dueDate: task.dueDate ? task.dueDate.split("T")[0] : "",
     }    

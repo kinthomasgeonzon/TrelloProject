@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCreateTaskMutation } from "@store/api/taskSlice";
+import { useGetAllUsersQuery } from "@store/api/userSlice";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { TaskSchema, taskSchema } from "../schemas/taskSchema";
@@ -8,6 +9,7 @@ export function useCreateTaskForm() {
   const [isOpen, setIsOpen] = useState(false);
   const [createTask, { isLoading }] = useCreateTaskMutation();
   const [userId, setUserId] = useState<number | null>(null);
+  const { data: users = [], isLoading: isUsersLoading, error } = useGetAllUsersQuery();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -34,17 +36,29 @@ export function useCreateTaskForm() {
     try {
       await createTask({
         ...data,
+        assignedTo: data.assignedTo ? Number(data.assignedTo) : null,
         dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : null,
         status: "TODO",
         createdBy: userId,
-        taskOrder: 1, //default
+        taskOrder: 1, // Default
       }).unwrap();
     } catch (err) {
-    }finally {
+      console.error("Failed to create task", err);
+    } finally {
       reset();
       setIsOpen(false);
     }
   };
 
-  return { register, handleSubmit, onSubmit, errors, isLoading, isOpen, setIsOpen };
+  return {
+    register,
+    handleSubmit,
+    onSubmit,
+    errors,
+    isLoading,
+    isUsersLoading,
+    users,
+    isOpen,
+    setIsOpen,
+  };
 }

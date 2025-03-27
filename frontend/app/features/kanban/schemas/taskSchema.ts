@@ -6,10 +6,7 @@ export const taskSchema = z.object({
   dueDate: z.string().optional(),
   status: z.string().optional(),
   taskOrder: z.number().optional(),
-  assignedTo: z.preprocess(
-    (val) => (val === "" ? undefined : Number(val)),
-    z.number().positive("Invalid user ID").optional()
-  ),
+  assignedTo: z.string().nullable().optional(),
 });
 
 export type TaskSchema = z.infer<typeof taskSchema>;

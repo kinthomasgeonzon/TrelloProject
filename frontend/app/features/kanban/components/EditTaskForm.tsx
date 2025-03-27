@@ -1,5 +1,6 @@
 "use client";
 
+import { useGetAllUsersQuery } from "@store/api/userSlice";
 import Modal from "../../../components/modal/Modal";
 import { useEditTaskForm } from "../hooks/useEditTaskForm";
 import { Task } from "../utils/Tasks";
@@ -8,18 +9,15 @@ interface EditTaskFormProps {
   task: Task;
   isOpen: boolean;
   onClose: () => void;
-  closeModal: () => void;
 }
 
-const EditTaskForm: React.FC<EditTaskFormProps> = ({
-  task,
-  isOpen,
-  onClose,
-}) => {
+const EditTaskForm: React.FC<EditTaskFormProps> = ({ task, isOpen, onClose }) => {
   if (!isOpen) return null;
 
-  const { register, handleSubmit, errors, isLoading, onSubmit } =
-    useEditTaskForm(task, onClose);
+  const { register, handleSubmit, errors, isLoading, onSubmit } = useEditTaskForm(task, onClose);
+  const { data: users = [], isLoading: isUsersLoading, error } = useGetAllUsersQuery();
+
+  if (error) console.error("Error fetching users:", error); 
 
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
@@ -48,13 +46,23 @@ const EditTaskForm: React.FC<EditTaskFormProps> = ({
 
         <div className="field">
           <label className="label">Assigned To</label>
-          <input
-            className="input"
-            type="number"
-            min="0"
-            {...register("assignedTo", { min: 0 })}
-          />
-          {errors.assignedTo && <p className="help is-danger">Assigned To must be a positive number</p>}
+          <div className="select">
+            <select {...register("assignedTo")}>
+              <option value="">Unassigned</option>
+              {isUsersLoading ? (
+                <option disabled>Loading users...</option>
+              ) : users.length > 0 ? (
+                users.map((user) => (
+                  <option key={user.id} value={String(user.id)}>
+                    {user.name}
+                  </option>
+                ))
+              ) : (
+                <option disabled>No users found</option>
+              )}
+            </select>
+          </div>
+          {errors.assignedTo && <p className="help is-danger">Please select a valid user</p>}
         </div>
 
         <div className="field">
@@ -62,11 +70,7 @@ const EditTaskForm: React.FC<EditTaskFormProps> = ({
           <input className="input" type="date" {...register("dueDate")} />
         </div>
 
-        <button
-          className="button is-primary"
-          type="submit"
-          disabled={isLoading}
-        >
+        <button className="button is-primary" type="submit" disabled={isLoading}>
           {isLoading ? "Saving..." : "Save Changes"}
         </button>
       </form>

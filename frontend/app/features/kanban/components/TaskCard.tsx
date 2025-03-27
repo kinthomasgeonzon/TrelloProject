@@ -40,7 +40,6 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
           task={task}
           isOpen={isEditing}
           onClose={() => setIsEditing(false)}
-          closeModal={() => setIsEditing(false)}
         />
       </Modal>
       )}

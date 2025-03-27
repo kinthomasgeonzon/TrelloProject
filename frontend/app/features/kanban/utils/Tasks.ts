@@ -5,7 +5,7 @@ export interface Task {
   description?: string;
   status: string;
   createdBy: number;
-  assignedTo?: number | null;
+  assignedTo?: string | null;
   dueDate?: string | null;
   createdAt: string;
 }

@@ -21,6 +21,19 @@ interface DraggableTaskProps {
   index: number;
 }
 
+const formatDueDate = (dateString: string | null | undefined) => {
+  if (!dateString) return "No due date";
+
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return "Invalid date";
+
+  return date.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
+
 const DraggableTask: React.FC<DraggableTaskProps> = ({ task, index }) => {
   const [isEditOpen, setIsEditOpen] = useState(false);
 
@@ -42,9 +55,14 @@ const DraggableTask: React.FC<DraggableTaskProps> = ({ task, index }) => {
             <div className="card-content">
               <p>{task.description}</p>
               <p className="has-text-grey">
-                Created By: {task.createdBy} | Assigned To: {task.assignedTo}
+                <strong>Created By:</strong> {task.createdBy} | 
+                <strong> Assigned To:</strong> {task.assignedTo}
               </p>
-              {task.dueDate && <p className="has-text-grey">Due: {task.dueDate}</p>}
+              {task.dueDate && (
+                <p className="has-text-grey">
+                  <strong>Due:</strong> {formatDueDate(task.dueDate)}
+                </p>
+              )}
             </div>
 
             <footer className="card-footer">
@@ -61,10 +79,9 @@ const DraggableTask: React.FC<DraggableTaskProps> = ({ task, index }) => {
 
       {isEditOpen && (
         <EditTaskForm
-          task={task}
+          task={{ ...task, assignedTo: String(task.assignedTo) }}
           isOpen={isEditOpen}
           onClose={() => setIsEditOpen(false)}
-          closeModal={() => setIsEditOpen(false)}
         />
       )}
     </>

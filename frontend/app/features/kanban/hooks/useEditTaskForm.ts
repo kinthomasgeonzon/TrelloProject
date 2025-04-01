@@ -9,7 +9,8 @@ import { Task } from "../utils/Tasks";
 export function useEditTaskForm(task: Task, onClose: () => void) {
   const [editTask, { isLoading }] = useEditTaskMutation();
   const { data: users = [], isLoading: isUsersLoading } = useGetAllUsersQuery();
-  const assignedUser = users.find((user) => user.id === Number(task.assignedTo));
+
+  const assignedUser = users.find((user) => user.name === task.assignedTo);
   const assignedUserId = assignedUser ? String(assignedUser.id) : "";
 
   const {
@@ -30,14 +31,8 @@ export function useEditTaskForm(task: Task, onClose: () => void) {
     },
   });
 
-  useEffect(() => {
-    setValue("assignedTo", assignedUserId);
-  }, [assignedUserId, setValue]);
-
   const onSubmit = async (data: TaskSchema) => {
     try {
-      const assignedToId = data.assignedTo ? Number(data.assignedTo) : null;
-
       await editTask({
         id: task.id,
         ...data,
@@ -45,7 +40,6 @@ export function useEditTaskForm(task: Task, onClose: () => void) {
         dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : null,
       }).unwrap();
     } catch (err) {
-      console.error("Failed to update task", err);
     } finally {
       reset();
       onClose();

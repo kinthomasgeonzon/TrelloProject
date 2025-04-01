@@ -13,8 +13,8 @@ interface EditTaskFormProps {
 const EditTaskForm: React.FC<EditTaskFormProps> = ({ task, isOpen, onClose }) => {
   if (!isOpen) return null;
 
-  const { register, handleSubmit, errors, isLoading, onSubmit, users, isUsersLoading, assignedUserId } =
-    useEditTaskForm(task, onClose);
+  const { register, handleSubmit, errors, isLoading, onSubmit, users, isUsersLoading } = useEditTaskForm(task, onClose);
+
 
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
@@ -44,18 +44,18 @@ const EditTaskForm: React.FC<EditTaskFormProps> = ({ task, isOpen, onClose }) =>
         <div className="field">
           <label className="label">Assigned To</label>
           <div className="select">
-            <select {...register("assignedTo")} defaultValue={assignedUserId}>
+            <select {...register("assignedTo")}>
               {isUsersLoading ? (
                 <option disabled>Loading users...</option>
               ) : users.length > 0 ? (
-                <>
-                  <option value="">Change Assigned User</option>
-                  {users.map((user) => (
-                    <option key={user.id} value={String(user.id)}>
-                      {user.name}
-                    </option>
-                  ))}
-                </>
+                users.map((user) => (
+                  <option 
+                    key={user.id} 
+                    value={String(user.id)}
+                  >
+                    {user.name}
+                  </option>
+                ))
               ) : (
                 <option disabled>No users found</option>
               )}

@@ -1,7 +1,6 @@
 "use client";
 
-import { useGetAllUsersQuery } from "@store/api/userSlice";
-import Modal from "../../../components/modal/Modal";
+import Modal from "@components/modal/Modal";
 import { useEditTaskForm } from "../hooks/useEditTaskForm";
 import { Task } from "../utils/Tasks";
 
@@ -14,10 +13,8 @@ interface EditTaskFormProps {
 const EditTaskForm: React.FC<EditTaskFormProps> = ({ task, isOpen, onClose }) => {
   if (!isOpen) return null;
 
-  const { register, handleSubmit, errors, isLoading, onSubmit } = useEditTaskForm(task, onClose);
-  const { data: users = [], isLoading: isUsersLoading, error } = useGetAllUsersQuery();
+  const { register, handleSubmit, errors, isLoading, onSubmit, users, isUsersLoading } = useEditTaskForm(task, onClose);
 
-  if (error) console.error("Error fetching users:", error); 
 
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
@@ -48,12 +45,14 @@ const EditTaskForm: React.FC<EditTaskFormProps> = ({ task, isOpen, onClose }) =>
           <label className="label">Assigned To</label>
           <div className="select">
             <select {...register("assignedTo")}>
-              <option value="">Unassigned</option>
               {isUsersLoading ? (
                 <option disabled>Loading users...</option>
               ) : users.length > 0 ? (
                 users.map((user) => (
-                  <option key={user.id} value={String(user.id)}>
+                  <option 
+                    key={user.id} 
+                    value={String(user.id)}
+                  >
                     {user.name}
                   </option>
                 ))
